@@ -1,4 +1,4 @@
-import { Home, Receipt, RepeatIcon, BarChart3, Settings, LogOut, Landmark, FileText, Wallet } from 'lucide-react';
+import { Home, Receipt, RepeatIcon, BarChart3, Settings, LogOut, Landmark, FileText, Wallet, Upload } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 
@@ -6,6 +6,7 @@ const navItems = [
   { path: '/', icon: Home, label: 'Tableau de bord' },
   { path: '/transactions', icon: Receipt, label: 'Transactions' },
   { path: '/accounts', icon: Wallet, label: 'Comptes' },
+  { path: '/import-csv', icon: Upload, label: 'Import CSV' },
   { path: '/recurring', icon: RepeatIcon, label: 'Charges fixes' },
   { path: '/stats', icon: BarChart3, label: 'Statistiques' },
   { path: '/taxes', icon: Landmark, label: 'Impôts' },

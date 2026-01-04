@@ -8,90 +8,87 @@ export default function ImportCsv() {
   const [showImport, setShowImport] = useState(false);
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-4xl mx-auto">
-        <button
-          onClick={() => navigate('/transactions')}
-          className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          Back to Transactions
-        </button>
+    <div className="space-y-6 pb-24">
+      <div>
+        <h1 className="text-2xl md:text-3xl font-bold">Import CSV</h1>
+        <p className="text-slate-400 mt-1 text-sm md:text-base">
+          Importez vos transactions bancaires
+        </p>
+      </div>
 
-        <div className="bg-white rounded-lg shadow-sm p-8">
-          <div className="text-center">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-4">
-              <FileDown className="w-8 h-8 text-blue-600" />
-            </div>
-
-            <h1 className="text-2xl font-bold mb-2">Import Bank Statement</h1>
-            <p className="text-gray-600 mb-8">
-              Import transactions from your bank's CSV export file
-            </p>
-
-            <button
-              onClick={() => setShowImport(true)}
-              className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 font-medium"
-            >
-              Start Import
-            </button>
+      <div className="bg-slate-800 rounded-xl p-8 border border-slate-700">
+        <div className="text-center">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-600/20 rounded-full mb-4">
+            <FileDown className="w-8 h-8 text-blue-400" />
           </div>
 
-          <div className="mt-12 border-t pt-8">
-            <h2 className="font-semibold mb-4">Supported Banks</h2>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="p-4 bg-gray-50 rounded-lg">
-                <h3 className="font-medium">UBS</h3>
-                <p className="text-sm text-gray-600">Automatic mapping</p>
-              </div>
-              <div className="p-4 bg-gray-50 rounded-lg">
-                <h3 className="font-medium">PostFinance</h3>
-                <p className="text-sm text-gray-600">Automatic mapping</p>
-              </div>
-              <div className="p-4 bg-gray-50 rounded-lg">
-                <h3 className="font-medium">Raiffeisen</h3>
-                <p className="text-sm text-gray-600">Automatic mapping</p>
-              </div>
-              <div className="p-4 bg-gray-50 rounded-lg">
-                <h3 className="font-medium">BCV</h3>
-                <p className="text-sm text-gray-600">Automatic mapping</p>
-              </div>
-              <div className="p-4 bg-gray-50 rounded-lg">
-                <h3 className="font-medium">Other Banks</h3>
-                <p className="text-sm text-gray-600">Manual mapping</p>
-              </div>
+          <h2 className="text-xl font-bold mb-2">Importer un releve bancaire</h2>
+          <p className="text-slate-400 mb-8">
+            Importez vos transactions depuis le fichier CSV de votre banque
+          </p>
+
+          <button
+            onClick={() => setShowImport(true)}
+            className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 font-medium"
+          >
+            Commencer l'import
+          </button>
+        </div>
+
+        <div className="mt-12 border-t border-slate-700 pt-8">
+          <h3 className="font-semibold mb-4">Banques supportees</h3>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="p-4 bg-slate-700/50 rounded-lg">
+              <h4 className="font-medium">UBS</h4>
+              <p className="text-sm text-slate-400">Mapping automatique</p>
+            </div>
+            <div className="p-4 bg-slate-700/50 rounded-lg">
+              <h4 className="font-medium">PostFinance</h4>
+              <p className="text-sm text-slate-400">Mapping automatique</p>
+            </div>
+            <div className="p-4 bg-slate-700/50 rounded-lg">
+              <h4 className="font-medium">Raiffeisen</h4>
+              <p className="text-sm text-slate-400">Mapping automatique</p>
+            </div>
+            <div className="p-4 bg-slate-700/50 rounded-lg">
+              <h4 className="font-medium">BCV</h4>
+              <p className="text-sm text-slate-400">Mapping automatique</p>
+            </div>
+            <div className="p-4 bg-slate-700/50 rounded-lg">
+              <h4 className="font-medium">Autres banques</h4>
+              <p className="text-sm text-slate-400">Mapping manuel</p>
             </div>
           </div>
+        </div>
 
-          <div className="mt-8 border-t pt-8">
-            <h2 className="font-semibold mb-4">How it works</h2>
-            <ol className="space-y-3 text-gray-700">
-              <li className="flex gap-3">
-                <span className="flex-shrink-0 w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-medium">
-                  1
-                </span>
-                <span>Upload your bank's CSV file and select the account</span>
-              </li>
-              <li className="flex gap-3">
-                <span className="flex-shrink-0 w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-medium">
-                  2
-                </span>
-                <span>We automatically detect your bank format and preview the data</span>
-              </li>
-              <li className="flex gap-3">
-                <span className="flex-shrink-0 w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-medium">
-                  3
-                </span>
-                <span>Verify or adjust the column mapping</span>
-              </li>
-              <li className="flex gap-3">
-                <span className="flex-shrink-0 w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-medium">
-                  4
-                </span>
-                <span>Import transactions - duplicates are automatically detected and skipped</span>
-              </li>
-            </ol>
-          </div>
+        <div className="mt-8 border-t border-slate-700 pt-8">
+          <h3 className="font-semibold mb-4">Comment ca marche</h3>
+          <ol className="space-y-3 text-slate-300">
+            <li className="flex gap-3">
+              <span className="flex-shrink-0 w-6 h-6 bg-blue-600/20 text-blue-400 rounded-full flex items-center justify-center text-sm font-medium">
+                1
+              </span>
+              <span>Telechargez votre fichier CSV et selectionnez le compte</span>
+            </li>
+            <li className="flex gap-3">
+              <span className="flex-shrink-0 w-6 h-6 bg-blue-600/20 text-blue-400 rounded-full flex items-center justify-center text-sm font-medium">
+                2
+              </span>
+              <span>Detection automatique du format de votre banque</span>
+            </li>
+            <li className="flex gap-3">
+              <span className="flex-shrink-0 w-6 h-6 bg-blue-600/20 text-blue-400 rounded-full flex items-center justify-center text-sm font-medium">
+                3
+              </span>
+              <span>Verifiez ou ajustez le mapping des colonnes</span>
+            </li>
+            <li className="flex gap-3">
+              <span className="flex-shrink-0 w-6 h-6 bg-blue-600/20 text-blue-400 rounded-full flex items-center justify-center text-sm font-medium">
+                4
+              </span>
+              <span>Import des transactions - les doublons sont detectes automatiquement</span>
+            </li>
+          </ol>
         </div>
       </div>
 
