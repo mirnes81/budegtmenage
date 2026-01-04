@@ -68,6 +68,8 @@ export default function CsvImport({ onClose, onSuccess }: CsvImportProps) {
   const [mapping, setMapping] = useState<ColumnMapping>({
     date: null,
     description: null,
+    description2: null,
+    description3: null,
     amount: null,
     debit: null,
     credit: null,
@@ -204,6 +206,8 @@ export default function CsvImport({ onClose, onSuccess }: CsvImportProps) {
 
       const dateIndex = csvData.headers.indexOf(mapping.date!);
       const descIndex = csvData.headers.indexOf(mapping.description!);
+      const desc2Index = mapping.description2 ? csvData.headers.indexOf(mapping.description2) : -1;
+      const desc3Index = mapping.description3 ? csvData.headers.indexOf(mapping.description3) : -1;
       const amountIndex = mapping.amount ? csvData.headers.indexOf(mapping.amount) : -1;
       const debitIndex = mapping.debit ? csvData.headers.indexOf(mapping.debit) : -1;
       const creditIndex = mapping.credit ? csvData.headers.indexOf(mapping.credit) : -1;
@@ -228,13 +232,18 @@ export default function CsvImport({ onClose, onSuccess }: CsvImportProps) {
           if (amountIndex >= 0 && row[amountIndex]) {
             amount = parseAmount(row[amountIndex], csvData.decimalSeparator);
           } else {
-            const debit = debitIndex >= 0 && row[debitIndex]
+            const debitValue = debitIndex >= 0 && row[debitIndex]
               ? parseAmount(row[debitIndex], csvData.decimalSeparator)
               : 0;
-            const credit = creditIndex >= 0 && row[creditIndex]
+            const creditValue = creditIndex >= 0 && row[creditIndex]
               ? parseAmount(row[creditIndex], csvData.decimalSeparator)
               : 0;
-            amount = credit - debit;
+
+            if (creditValue !== 0) {
+              amount = creditValue;
+            } else if (debitValue !== 0) {
+              amount = -Math.abs(debitValue);
+            }
           }
 
           if (amount === 0) {
@@ -242,7 +251,15 @@ export default function CsvImport({ onClose, onSuccess }: CsvImportProps) {
             continue;
           }
 
-          const description = normalizeDescription(row[descIndex] || 'Unknown');
+          const descParts = [
+            row[descIndex] || '',
+            desc2Index >= 0 ? row[desc2Index] || '' : '',
+            desc3Index >= 0 ? row[desc3Index] || '' : ''
+          ].filter(part => part.trim()).map(part => part.trim());
+
+          const description = normalizeDescription(
+            descParts.length > 0 ? descParts.join(' ') : 'Unknown'
+          );
 
           const lineHash = await generateLineHash({
             accountId: selectedAccount,

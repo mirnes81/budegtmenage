@@ -91,14 +91,21 @@ export function detectEncoding(buffer: ArrayBuffer): string {
 }
 
 export function parseCsv(content: string, delimiter: string = ','): CsvParseResult {
-  const lines = content.split(/\r?\n/).filter(line => line.trim());
+  let cleanContent = content;
+  if (cleanContent.charCodeAt(0) === 0xFEFF) {
+    cleanContent = cleanContent.slice(1);
+  }
+
+  const lines = cleanContent.split(/\r?\n/).filter(line => line.trim());
 
   if (lines.length === 0) {
     return { headers: [], rows: [], delimiter, encoding: 'UTF-8' };
   }
 
-  const headers = splitCsvLine(lines[0], delimiter);
-  const rows = lines.slice(1).map(line => splitCsvLine(line, delimiter));
+  const headerIndex = findHeaderLine(lines, delimiter);
+
+  const headers = splitCsvLine(lines[headerIndex], delimiter);
+  const rows = lines.slice(headerIndex + 1).map(line => splitCsvLine(line, delimiter));
 
   return {
     headers,
@@ -106,6 +113,34 @@ export function parseCsv(content: string, delimiter: string = ','): CsvParseResu
     delimiter,
     encoding: 'UTF-8'
   };
+}
+
+function findHeaderLine(lines: string[], delimiter: string): number {
+  const ubsHeaderSignature = 'date de transaction';
+
+  for (let i = 0; i < Math.min(lines.length, 20); i++) {
+    const line = lines[i].toLowerCase().trim();
+
+    if (line.startsWith(ubsHeaderSignature)) {
+      return i;
+    }
+
+    const firstCell = line.split(delimiter)[0]?.toLowerCase().trim();
+    if (firstCell && (
+      firstCell.includes('date') ||
+      firstCell === 'datum' ||
+      firstCell.includes('transaction')
+    )) {
+      const cells = line.split(delimiter);
+      const nonEmptyCells = cells.filter(c => c.trim()).length;
+
+      if (nonEmptyCells >= 3) {
+        return i;
+      }
+    }
+  }
+
+  return 0;
 }
 
 function splitCsvLine(line: string, delimiter: string): string[] {

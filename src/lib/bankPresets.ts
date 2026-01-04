@@ -15,6 +15,8 @@ export interface BankPreset {
 export interface ColumnMapping {
   date: string | null;
   description: string | null;
+  description2: string | null;
+  description3: string | null;
   amount: string | null;
   debit: string | null;
   credit: string | null;
@@ -79,6 +81,8 @@ export function mapColumns(
   const mapping: ColumnMapping = {
     date: null,
     description: null,
+    description2: null,
+    description3: null,
     amount: null,
     debit: null,
     credit: null,
@@ -106,6 +110,16 @@ export function mapColumns(
         break;
       }
     }
+  }
+
+  const desc1 = normalizedHeaders.findIndex(h => h === 'Description1');
+  const desc2 = normalizedHeaders.findIndex(h => h === 'Description2');
+  const desc3 = normalizedHeaders.findIndex(h => h === 'Description3');
+
+  if (desc1 !== -1) {
+    mapping.description = 'Description1';
+    if (desc2 !== -1) mapping.description2 = 'Description2';
+    if (desc3 !== -1) mapping.description3 = 'Description3';
   }
 
   return mapping;
