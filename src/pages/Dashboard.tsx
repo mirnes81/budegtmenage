@@ -71,10 +71,10 @@ export function Dashboard() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-24">
       <div>
-        <h1 className="text-3xl font-bold">Tableau de bord</h1>
-        <p className="text-slate-400 mt-1">
+        <h1 className="text-2xl md:text-3xl font-bold">Tableau de bord</h1>
+        <p className="text-slate-400 mt-1 text-sm md:text-base">
           Aperçu de votre budget pour {format(new Date(), 'MMMM yyyy')}
         </p>
       </div>
@@ -138,28 +138,26 @@ export function Dashboard() {
             recentTransactions.map((transaction, index) => (
               <div
                 key={index}
-                className="flex items-center justify-between p-4 bg-slate-700/50 rounded-lg"
+                className="flex items-center gap-3 p-4 bg-slate-700/50 rounded-lg"
               >
-                <div className="flex items-center gap-3">
-                  <div
-                    className="w-10 h-10 rounded-full flex items-center justify-center"
-                    style={{ backgroundColor: transaction.categories?.color + '20' }}
-                  >
-                    <span style={{ color: transaction.categories?.color }}>
-                      {transaction.categories?.icon}
-                    </span>
-                  </div>
-                  <div>
-                    <p className="font-medium">{transaction.description}</p>
-                    <p className="text-sm text-slate-400">{transaction.categories?.name}</p>
-                  </div>
+                <div
+                  className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden"
+                  style={{ backgroundColor: transaction.categories?.color + '20' }}
+                >
+                  <span className="text-lg leading-none" style={{ color: transaction.categories?.color }}>
+                    {transaction.categories?.icon}
+                  </span>
                 </div>
-                <div className="text-right">
-                  <p className={`font-bold ${transaction.type === 'income' ? 'text-green-400' : 'text-red-400'}`}>
+                <div className="flex-1 min-w-0">
+                  <p className="font-medium truncate">{transaction.description}</p>
+                  <p className="text-xs text-slate-400 truncate">{transaction.categories?.name}</p>
+                </div>
+                <div className="text-right flex-shrink-0">
+                  <p className={`font-bold text-sm whitespace-nowrap ${transaction.type === 'income' ? 'text-green-400' : 'text-red-400'}`}>
                     {transaction.type === 'income' ? '+' : '-'}CHF {formatCHF(Math.abs(transaction.amount))}
                   </p>
-                  <p className="text-sm text-slate-400">
-                    {format(new Date(transaction.date), 'dd MMM yyyy')}
+                  <p className="text-xs text-slate-400 whitespace-nowrap">
+                    {format(new Date(transaction.date), 'dd MMM')}
                   </p>
                 </div>
               </div>

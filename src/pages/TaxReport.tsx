@@ -96,15 +96,15 @@ export function TaxReport() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-24">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <h1 className="text-3xl font-bold">Rapport Fiscal (VD)</h1>
+        <h1 className="text-2xl md:text-3xl font-bold">Rapport Fiscal (VD)</h1>
 
-        <div className="flex gap-3">
+        <div className="flex gap-3 w-full md:w-auto">
           <select
             value={selectedYear}
             onChange={(e) => setSelectedYear(parseInt(e.target.value))}
-            className="px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 flex-1 md:flex-none"
           >
             {years.map((year) => (
               <option key={year} value={year}>
@@ -116,10 +116,11 @@ export function TaxReport() {
           <button
             onClick={exportCSV}
             disabled={transactions.length === 0}
-            className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors"
+            className="flex items-center justify-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors whitespace-nowrap"
           >
-            <Download size={20} />
-            Export CSV
+            <Download size={18} />
+            <span className="hidden sm:inline">Export CSV</span>
+            <span className="sm:hidden">CSV</span>
           </button>
         </div>
       </div>

@@ -161,10 +161,10 @@ export function TransactionsNew() {
   }
 
   return (
-    <div className="space-y-6 pb-24">
-      <h1 className="text-3xl font-bold">Transactions</h1>
+    <div className="space-y-4 pb-24">
+      <h1 className="text-2xl md:text-3xl font-bold">Transactions</h1>
 
-      <div className="flex flex-col md:flex-row gap-4">
+      <div className="flex flex-col gap-3">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
           <input
@@ -175,10 +175,10 @@ export function TransactionsNew() {
             className="w-full pl-10 pr-4 py-3 bg-slate-800 border border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 overflow-x-auto pb-1">
           <button
             onClick={() => setFilterType('all')}
-            className={`px-4 py-2 rounded-xl font-medium transition-colors ${
+            className={`px-4 py-2 rounded-xl font-medium transition-colors whitespace-nowrap ${
               filterType === 'all' ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
             }`}
           >
@@ -186,7 +186,7 @@ export function TransactionsNew() {
           </button>
           <button
             onClick={() => setFilterType('income')}
-            className={`px-4 py-2 rounded-xl font-medium transition-colors ${
+            className={`px-4 py-2 rounded-xl font-medium transition-colors whitespace-nowrap ${
               filterType === 'income' ? 'bg-green-600 text-white' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
             }`}
           >
@@ -194,7 +194,7 @@ export function TransactionsNew() {
           </button>
           <button
             onClick={() => setFilterType('expense')}
-            className={`px-4 py-2 rounded-xl font-medium transition-colors ${
+            className={`px-4 py-2 rounded-xl font-medium transition-colors whitespace-nowrap ${
               filterType === 'expense' ? 'bg-red-600 text-white' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
             }`}
           >
@@ -231,46 +231,46 @@ export function TransactionsNew() {
                   {dayTransactions.map((transaction) => (
                     <div
                       key={transaction.id}
-                      className="bg-slate-800 rounded-xl p-4 border border-slate-700 hover:border-slate-600 transition-colors relative"
+                      className="bg-slate-800 rounded-xl p-4 border border-slate-700 hover:border-slate-600 transition-colors"
                     >
-                      <div className="flex items-center gap-4">
+                      <div className="flex items-start gap-3">
                         <div
-                          className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
+                          className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 overflow-hidden"
                           style={{
                             backgroundColor: transaction.categories?.color + '20',
                           }}
                         >
-                          <span className="text-2xl">{transaction.categories?.icon || '📄'}</span>
+                          <span className="text-xl leading-none">{transaction.categories?.icon || '📄'}</span>
                         </div>
 
-                        <div className="flex-1 min-w-0">
-                          <p className="font-medium text-white truncate">{transaction.description}</p>
-                          <p className="text-sm text-slate-400 truncate">
+                        <div className="flex-1 min-w-0 pr-2">
+                          <p className="font-medium text-white truncate mb-1">{transaction.description}</p>
+                          <p className="text-xs text-slate-400 truncate">
                             {transaction.categories?.name} • {transaction.members?.name}
                           </p>
                         </div>
 
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-start gap-2 flex-shrink-0">
                           <div className="text-right">
                             <p
-                              className={`text-lg font-bold ${
+                              className={`text-base font-bold whitespace-nowrap ${
                                 transaction.type === 'income' ? 'text-green-400' : 'text-red-400'
                               }`}
                             >
                               {transaction.type === 'income' ? '+' : '-'}CHF{' '}
                               {formatCHF(Math.abs(transaction.amount))}
                             </p>
-                            <p className="text-xs text-slate-400">{transaction.accounts?.name}</p>
+                            <p className="text-xs text-slate-400 truncate max-w-[80px]">{transaction.accounts?.name}</p>
                           </div>
 
-                          <div className="relative">
+                          <div className="relative flex-shrink-0">
                             <button
                               onClick={() =>
                                 setOpenMenuId(openMenuId === transaction.id ? null : transaction.id)
                               }
-                              className="p-2 hover:bg-slate-700 rounded-lg transition-colors"
+                              className="p-1.5 hover:bg-slate-700 rounded-lg transition-colors flex-shrink-0"
                             >
-                              <MoreVertical size={20} className="text-slate-400" />
+                              <MoreVertical size={18} className="text-slate-400" />
                             </button>
 
                             {openMenuId === transaction.id && (

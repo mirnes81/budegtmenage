@@ -288,6 +288,29 @@
 - [x] **Calcul franchise santé** - 5% revenu testé
 - [x] **Format summary** - Formatage testé
 
+## Améliorations Mobile (Janvier 2026)
+### Corrections d'affichage
+- [x] **Transaction cards** - Emojis contraints, texte tronqué correctement
+- [x] **Layout flex amélioré** - Utilisation de flex-shrink-0, min-w-0, truncate
+- [x] **Icônes optimisées** - Taille réduite (text-xl, leading-none, overflow-hidden)
+- [x] **Boutons responsive** - Text adaptatif (sm:inline/sm:hidden)
+- [x] **Headers responsive** - Titres text-2xl md:text-3xl
+- [x] **Padding bottom** - pb-24 sur toutes les pages pour éviter bottom nav
+
+### Pages optimisées mobile
+- [x] **Dashboard** - Cards transactions compactes et responsive
+- [x] **Transactions** - Layout amélioré, filtres scrollables horizontalement
+- [x] **Stats** - Boutons export adaptés mobile
+- [x] **Rapport Fiscal** - Dropdown et export responsive
+- [x] **Recurring** - Boutons génération adaptés mobile
+
+### Détails techniques
+- [x] **whitespace-nowrap** sur montants pour éviter coupure
+- [x] **max-w-[80px]** sur noms de comptes
+- [x] **gap-3** au lieu de gap-4 pour plus compact
+- [x] **items-start** au lieu de items-center pour éviter étirement
+- [x] **flex-1 md:flex-none** sur selects pour remplir largeur mobile
+
 ## Notes
 - Application complète et fonctionnelle
 - Toutes les pages principales implémentées
@@ -298,7 +321,8 @@
 - **Rapport fiscal avec agrégation et export CSV**
 - Format CHF suisse respecté
 - Dark mode par défaut
-- Responsive mobile et desktop
+- **Responsive mobile et desktop - optimisé janvier 2026**
 - Tests unitaires passent (30/30)
-- Build réussi (823 KB / 246 KB gzipped)
+- Build réussi (832 KB / 248 KB gzipped)
 - **UX premium style FocusDaily implémentée**
+- **Problèmes d'affichage mobile corrigés (débordement texte, emojis)**

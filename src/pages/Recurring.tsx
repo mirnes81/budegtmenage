@@ -213,17 +213,18 @@ export function Recurring() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-24">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <h1 className="text-3xl font-bold">Charges fixes</h1>
-        <div className="flex gap-2">
+        <h1 className="text-2xl md:text-3xl font-bold">Charges fixes</h1>
+        <div className="flex gap-2 w-full md:w-auto flex-wrap">
           <button
             onClick={generateTransactions}
             disabled={generating}
-            className="flex items-center gap-2 bg-green-600 hover:bg-green-700 disabled:bg-slate-600 px-4 py-2 rounded-lg transition-colors"
+            className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 disabled:bg-slate-600 px-4 py-2 rounded-lg transition-colors flex-1 md:flex-none whitespace-nowrap"
           >
-            <PlayCircle size={20} />
-            {generating ? 'Génération...' : 'Générer ce mois'}
+            <PlayCircle size={18} />
+            <span className="hidden sm:inline">{generating ? 'Génération...' : 'Générer ce mois'}</span>
+            <span className="sm:hidden">{generating ? 'Génération...' : 'Générer'}</span>
           </button>
           <button
             onClick={() => {
@@ -231,10 +232,11 @@ export function Recurring() {
               setEditingId(null);
               setShowModal(true);
             }}
-            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg transition-colors"
+            className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg transition-colors flex-1 md:flex-none whitespace-nowrap"
           >
-            <Plus size={20} />
-            Nouvelle charge
+            <Plus size={18} />
+            <span className="hidden sm:inline">Nouvelle charge</span>
+            <span className="sm:hidden">Nouvelle</span>
           </button>
         </div>
       </div>
