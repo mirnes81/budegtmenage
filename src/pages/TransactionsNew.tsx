@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Search, MoreVertical, Copy, Edit2, Trash2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Search, MoreVertical, Copy, Edit2, Trash2, FileDown } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { formatCHF, getMerchantInitials, getMerchantColor } from '../lib/utils';
 import { format, parseISO, isToday, isYesterday } from 'date-fns';
@@ -24,6 +25,7 @@ interface Transaction {
 }
 
 export function TransactionsNew() {
+  const navigate = useNavigate();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -199,6 +201,13 @@ export function TransactionsNew() {
             }`}
           >
             Dépenses
+          </button>
+          <button
+            onClick={() => navigate('/import-csv')}
+            className="ml-auto px-4 py-2 rounded-xl font-medium transition-colors whitespace-nowrap bg-purple-600 text-white hover:bg-purple-700 flex items-center gap-2"
+          >
+            <FileDown size={18} />
+            Import CSV
           </button>
         </div>
       </div>

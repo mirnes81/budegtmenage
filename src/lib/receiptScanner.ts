@@ -222,13 +222,13 @@ export function extractMerchantFromText(text: string): string | null {
 
   // Patterns à éviter (lignes qui contiennent ces éléments ne sont probablement pas le nom)
   const avoidPatterns = [
-    /^\d+$/,                           // Uniquement des chiffres
-    /^[0-9\s\-\.\(\)\/]+$/,           // Numéros de téléphone, dates
-    /^\*+$/,                           // Séparateurs
-    /^[\-=_]+$/,                       // Séparateurs
-    /TVA|VAT|MWST|TAX/i,              // Lignes de taxes
-    /^\s*$/,                           // Lignes vides
-    /@|\.com|\.ch|\.fr|\.de/i,        // Emails/sites web
+    /^\d+$/,
+    /^[0-9\s.()/-]+$/,
+    /^\*+$/,
+    /^[-=_]+$/,
+    /TVA|VAT|MWST|TAX/i,
+    /^\s*$/,
+    /@|\.com|\.ch|\.fr|\.de/i,
   ];
 
   const candidates: { text: string; score: number; index: number }[] = [];

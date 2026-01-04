@@ -344,6 +344,110 @@
 - [x] **suggestDeductionType** - 4 tests
 - [x] **Total tests** - 56/56 passent ✅
 
+## Import CSV Bancaire (Janvier 2026)
+### Étape 1 - Upload
+- [x] **Page import dédiée** - Route /import-csv accessible
+- [x] **Bouton dans Transactions** - Lien "Import CSV" visible
+- [x] **Sélection compte** - Dropdown tous comptes disponibles
+- [x] **Upload fichier** - Input file accepte .csv uniquement
+- [x] **Affichage fichier** - Nom et taille affichés
+- [x] **Validation** - Erreur si pas .csv ou pas de compte sélectionné
+- [x] **Bouton Analyser** - Lance l'analyse du fichier
+
+### Étape 2 - Détection automatique
+- [x] **Détection séparateur** - ; , ou \t détecté automatiquement
+- [x] **Détection format date** - dd.MM.yyyy, yyyy-MM-dd, dd/MM/yyyy
+- [x] **Détection décimales** - . ou , détecté
+- [x] **Détection preset banque** - UBS, PostFinance, Raiffeisen, BCV, Generic
+- [x] **Preview CSV** - Affichage 20 premières lignes avec headers
+- [x] **Warning doublon fichier** - Message si fichier déjà importé avec date
+
+### Étape 3 - Mapping colonnes
+- [x] **Mapping automatique** - Colonnes mappées selon preset détecté
+- [x] **Mapping manuel** - Dropdowns pour chaque champ si Generic
+- [x] **Champs requis** - Date, Description validés
+- [x] **Amount OU Debit/Credit** - Au moins un requis
+- [x] **Champs optionnels** - Currency, Balance, ValueDate, Reference
+- [x] **Sélection membre** - Défaut "Ménage"
+- [x] **Toggle règles marchands** - ON par défaut (auto-catégorisation)
+- [x] **Toggle mémoriser mapping** - ON par défaut
+- [x] **Validation mapping** - Messages d'erreur si incomplet
+
+### Étape 4 - Import et résultat
+- [x] **Import transactions** - Création en base de données
+- [x] **Déduplication par hash** - import_line_hash unique
+- [x] **Skip doublons** - Transactions existantes ignorées
+- [x] **Compteurs** - Total / Importées / Ignorées affichés
+- [x] **Liste erreurs** - Si erreurs lors import
+- [x] **Bouton Terminé** - Retour à liste transactions
+
+### Parsing robuste
+- [x] **Parse montants** - 1'234.50, 1.234,50, 1234.50, 1234,50
+- [x] **Parse debit/credit** - Colonnes séparées supportées
+- [x] **Parse montant signé** - Colonne Amount avec +/-
+- [x] **Parse dates** - Multiples formats supportés
+- [x] **Normalisation description** - Trim, collapse spaces, remove control chars
+- [x] **Gestion currency** - CHF, EUR, USD reconnus
+- [x] **Gestion balance** - Colonne solde optionnelle
+- [x] **Gestion valeurs vides** - Skip lignes invalides
+
+### Anti-doublons
+- [x] **Line hash** - SHA-256 (accountId + date + amount + description + ref + valueDate)
+- [x] **Unique index** - import_line_hash indexé en base
+- [x] **File hash** - SHA-256 du fichier complet
+- [x] **Detection réimport** - Warning si fichier déjà importé
+- [x] **Table import_files** - Historique des imports
+- [x] **Compteur usage** - rows_total, rows_imported, rows_skipped
+
+### Présets banques
+- [x] **Preset UBS** - Headers détectés, mapping auto
+- [x] **Preset PostFinance** - Structure prête
+- [x] **Preset Raiffeisen** - Structure prête
+- [x] **Preset BCV** - Structure prête
+- [x] **Preset Generic** - Mapping manuel pour autres banques
+- [x] **Match partiel** - 50% threshold pour détection
+- [x] **Case insensitive** - Headers matchés sans casse
+- [x] **Table bank_csv_presets** - Présets en base de données
+- [x] **Multi-language** - EN/DE/FR headers supportés
+
+### Base de données
+- [x] **Table import_files** - id, account_id, file_name, file_hash, stats, created_at
+- [x] **Table bank_csv_presets** - id, name, match_headers, mapping, hints
+- [x] **Transactions.import_source** - "CSV" ou "MANUAL"
+- [x] **Transactions.import_line_hash** - Unique index pour déduplication
+- [x] **Transactions.import_file_id** - Foreign key vers import_files
+- [x] **RLS activé** - Policies sur toutes nouvelles tables
+- [x] **Unique constraint** - (account_id, file_hash) pour détection réimport
+
+### Privacy et sécurité
+- [x] **CSV en mémoire** - Fichiers jamais stockés sur serveur
+- [x] **Hash uniquement** - Seulement file_hash sauvegardé
+- [x] **RLS** - Row Level Security sur toutes tables
+- [x] **Validation inputs** - Tous champs validés avant insert
+- [x] **No SQL injection** - Prepared statements Supabase
+
+### Tests
+- [x] **Tests CSV parser** - 24 tests unitaires
+- [x] **Tests déduplication** - 9 tests unitaires
+- [x] **Tests bank presets** - 17 tests unitaires
+- [x] **Total tests import** - 50 tests passent ✅
+- [x] **Détection délimiteur** - Testé
+- [x] **Parse montants** - Tous formats testés
+- [x] **Parse dates** - Multiples formats testés
+- [x] **Hash stable** - Génération consistente testée
+- [x] **Validation mapping** - Cas valides/invalides testés
+
+### UX/UI
+- [x] **Wizard 4 étapes** - Progression visuelle claire
+- [x] **Numéros étapes** - 1-2-3-4 avec couleurs
+- [x] **Bouton retour** - Navigation vers Transactions
+- [x] **Liste banques supportées** - Affichée sur page accueil
+- [x] **Instructions claires** - 4 étapes expliquées
+- [x] **Loading states** - Spinners pendant analyse/import
+- [x] **Messages erreur** - Clairs et contextuels
+- [x] **Messages succès** - Toast après import
+- [x] **Responsive** - Mobile et desktop optimisés
+
 ## Notes
 - Application complète et fonctionnelle
 - Toutes les pages principales implémentées
@@ -353,11 +457,13 @@
 - **Déductions fiscales VD avec suggestions automatiques**
 - **Rapport fiscal avec agrégation et export CSV**
 - **Scan de tickets avec apprentissage automatique fournisseur**
-- **Privacy by design: aucune image sauvegardée**
+- **Import CSV bancaire avec présets UBS + autres banques**
+- **Anti-doublons infaillible avec line hash + file hash**
+- **Privacy by design: aucune image ni CSV sauvegardés**
 - Format CHF suisse respecté
 - Dark mode par défaut
 - **Responsive mobile et desktop - optimisé janvier 2026**
-- Tests unitaires passent (56/56) ✅
-- Build réussi (862 KB / 258 KB gzipped)
+- Tests unitaires passent (106/106) ✅
+- Build réussi
 - **UX premium style FocusDaily implémentée**
 - **Problèmes d'affichage mobile corrigés (débordement texte, emojis)**

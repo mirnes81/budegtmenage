@@ -9,6 +9,7 @@ import { Stats } from './pages/Stats';
 import { Taxes } from './pages/Taxes';
 import { TaxReport } from './pages/TaxReport';
 import { Settings } from './pages/Settings';
+import ImportCsv from './pages/ImportCsv';
 
 function App() {
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
@@ -23,6 +24,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Dashboard />} />
           <Route path="/transactions" element={<TransactionsNew />} />
+          <Route path="/import-csv" element={<ImportCsv />} />
           <Route path="/recurring" element={<Recurring />} />
           <Route path="/stats" element={<Stats />} />
           <Route path="/taxes" element={<Taxes />} />
