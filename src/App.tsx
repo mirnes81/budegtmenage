@@ -7,6 +7,7 @@ import { TransactionsNew } from './pages/TransactionsNew';
 import { Recurring } from './pages/Recurring';
 import { Stats } from './pages/Stats';
 import { Taxes } from './pages/Taxes';
+import { TaxReport } from './pages/TaxReport';
 import { Settings } from './pages/Settings';
 
 function App() {
@@ -25,6 +26,7 @@ function App() {
           <Route path="/recurring" element={<Recurring />} />
           <Route path="/stats" element={<Stats />} />
           <Route path="/taxes" element={<Taxes />} />
+          <Route path="/tax-report" element={<TaxReport />} />
           <Route path="/settings" element={<Settings />} />
         </Routes>
       </Layout>

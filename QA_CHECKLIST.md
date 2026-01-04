@@ -253,15 +253,52 @@
 - [x] **Debounce search** - Pas implémenté (pas nécessaire avec React state)
 - [x] **Smooth scroll** - Navigation fluide entre sections
 
+## Déductions Fiscales (Canton de Vaud)
+### Suggestions Automatiques
+- [x] **Règles de déduction** - 5 règles créées (LAMal, Médecin/Pharmacie, École/Crèche, Loyer/Hypothèque, Entretien/Réparations)
+- [x] **Suggestion lors de saisie** - Bandeau bleu apparaît après sélection catégorie
+- [x] **Boutons Confirmer/Ignorer** - Actions claires
+- [x] **Split choice pour règles ambiguës** - Demande précision (entretien vs amélioration, etc.)
+- [x] **Confirmation visuelle** - Badge vert quand déduction confirmée
+- [x] **Sauvegarde avec transaction** - deduction_type, deduction_status, tax_year stockés
+
+### Page Rapport Fiscal
+- [x] **Sélecteur année** - Dropdown 5 dernières années
+- [x] **Revenu estimé** - Calculé automatiquement depuis transactions income
+- [x] **Déductions totales** - Somme de toutes déductions confirmées
+- [x] **Section Santé spéciale** - Calcul franchise 5% revenu net
+- [x] **Montant déductible santé** - Total - franchise, avec détails
+- [x] **Déductions par type** - Card pour chaque type avec notes VD
+- [x] **Liste transactions détaillées** - Toutes transactions avec déduction confirmée
+- [x] **Export CSV** - Téléchargement rapport complet
+- [x] **Disclaimer clair** - Avertissement estimation indicative
+- [x] **Empty state** - Message si aucune déduction
+
+### Data Model
+- [x] **Colonne deduction_type** - Enum 7 types (NONE, HEALTH, CHILDCARE, etc.)
+- [x] **Colonne deduction_status** - Enum 4 statuts (NONE, SUGGESTED, CONFIRMED, REJECTED)
+- [x] **Colonne tax_year** - Année fiscale auto-remplie
+- [x] **Table deduction_rules** - Règles suggestion par catégorie
+- [x] **RLS activé** - Policies lecture/écriture pour authenticated
+- [x] **Index créés** - tax_year, deduction_type, deduction_status, category_id
+
+### Tests
+- [x] **Tests unitaires déductions** - 11 tests pour taxDeductions.ts
+- [x] **Aggregate par type** - Fonction testée
+- [x] **Calcul franchise santé** - 5% revenu testé
+- [x] **Format summary** - Formatage testé
+
 ## Notes
 - Application complète et fonctionnelle
 - Toutes les pages principales implémentées
 - CRUD complet sur transactions et charges fixes
 - Statistiques avec graphiques
 - Estimation impôts basique mais fonctionnelle
+- **Déductions fiscales VD avec suggestions automatiques**
+- **Rapport fiscal avec agrégation et export CSV**
 - Format CHF suisse respecté
 - Dark mode par défaut
 - Responsive mobile et desktop
-- Tests unitaires passent (19/19)
-- Build réussi (820 KB / 245 KB gzipped)
+- Tests unitaires passent (30/30)
+- Build réussi (823 KB / 246 KB gzipped)
 - **UX premium style FocusDaily implémentée**

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { format } from 'date-fns';
-import { ChevronRight, Calendar } from 'lucide-react';
+import { ChevronRight, Calendar, Info, Check, X } from 'lucide-react';
 import { Sheet } from './ui/Sheet';
 import { Picker } from './ui/Picker';
 import { supabase } from '../lib/supabase';
@@ -9,6 +9,13 @@ import {
   getTransactionDefaults,
   saveTransactionDefaults,
 } from '../lib/smartDefaults';
+import {
+  getDeductionRuleForCategory,
+  DeductionType,
+  DeductionStatus,
+  DeductionSuggestion,
+  DEDUCTION_LABELS,
+} from '../lib/taxDeductions';
 
 interface QuickAddTransactionProps {
   open: boolean;
@@ -62,6 +69,11 @@ export function QuickAddTransaction({
   const [showAccountPicker, setShowAccountPicker] = useState(false);
   const [showMemberPicker, setShowMemberPicker] = useState(false);
 
+  const [deductionSuggestion, setDeductionSuggestion] = useState<DeductionSuggestion | null>(null);
+  const [deductionType, setDeductionType] = useState<DeductionType>('NONE');
+  const [deductionStatus, setDeductionStatus] = useState<DeductionStatus>('NONE');
+  const [showSplitChoice, setShowSplitChoice] = useState(false);
+
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -89,6 +101,57 @@ export function QuickAddTransaction({
       }
     }
   }, [open, editingTransaction, duplicatingTransaction]);
+
+  useEffect(() => {
+    if (categoryId && type === 'expense') {
+      loadDeductionRule(categoryId);
+    } else {
+      setDeductionSuggestion(null);
+      setShowSplitChoice(false);
+    }
+  }, [categoryId, type]);
+
+  const loadDeductionRule = async (catId: string) => {
+    const rule = await getDeductionRuleForCategory(catId);
+    if (rule) {
+      setDeductionSuggestion(rule);
+      setDeductionType(rule.deductionType);
+      setDeductionStatus('SUGGESTED');
+    } else {
+      setDeductionSuggestion(null);
+      setDeductionType('NONE');
+      setDeductionStatus('NONE');
+    }
+  };
+
+  const handleConfirmDeduction = () => {
+    if (!deductionSuggestion) return;
+
+    if (deductionSuggestion.needsUserSplit) {
+      setShowSplitChoice(true);
+    } else {
+      setDeductionStatus('CONFIRMED');
+      setDeductionSuggestion(null);
+    }
+  };
+
+  const handleRejectDeduction = () => {
+    setDeductionType('NONE');
+    setDeductionStatus('REJECTED');
+    setDeductionSuggestion(null);
+    setShowSplitChoice(false);
+  };
+
+  const handleSplitChoice = (isDeductible: boolean) => {
+    if (isDeductible) {
+      setDeductionStatus('CONFIRMED');
+    } else {
+      setDeductionType('NONE');
+      setDeductionStatus('REJECTED');
+    }
+    setShowSplitChoice(false);
+    setDeductionSuggestion(null);
+  };
 
   const resetToDefaults = () => {
     const defaults = getTransactionDefaults();
@@ -119,6 +182,10 @@ export function QuickAddTransaction({
     setDescription('');
     setNotes('');
     setDate(format(new Date(), 'yyyy-MM-dd'));
+    setDeductionType('NONE');
+    setDeductionStatus('NONE');
+    setDeductionSuggestion(null);
+    setShowSplitChoice(false);
   };
 
   const handleSave = async () => {
@@ -131,6 +198,7 @@ export function QuickAddTransaction({
 
     try {
       const numAmount = parseFloat(amount);
+      const taxYear = new Date(date).getFullYear();
       const transactionData = {
         date,
         amount: type === 'expense' ? -Math.abs(numAmount) : Math.abs(numAmount),
@@ -140,6 +208,9 @@ export function QuickAddTransaction({
         member_id: memberId,
         description,
         notes: notes || null,
+        deduction_type: deductionType,
+        deduction_status: deductionStatus,
+        tax_year: taxYear,
       };
 
       if (editingTransaction) {
@@ -275,6 +346,86 @@ export function QuickAddTransaction({
               <ChevronRight size={20} className="text-slate-400" />
             </button>
           </div>
+
+          {deductionSuggestion && !showSplitChoice && (
+            <div className="bg-blue-900/30 border border-blue-700 rounded-xl p-4">
+              <div className="flex items-start gap-3">
+                <Info size={20} className="text-blue-400 flex-shrink-0 mt-0.5" />
+                <div className="flex-1 min-w-0">
+                  <p className="font-medium text-blue-300 mb-1">
+                    Déduction fiscale suggérée (VD)
+                  </p>
+                  <p className="text-sm text-blue-200 mb-2">
+                    {DEDUCTION_LABELS[deductionSuggestion.deductionType]}
+                  </p>
+                  <p className="text-xs text-blue-300/80 mb-3">
+                    {deductionSuggestion.note}
+                  </p>
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={handleConfirmDeduction}
+                      className="flex items-center gap-1 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-lg transition-colors"
+                    >
+                      <Check size={16} />
+                      Confirmer
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleRejectDeduction}
+                      className="flex items-center gap-1 px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-white text-sm rounded-lg transition-colors"
+                    >
+                      <X size={16} />
+                      Ignorer
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {showSplitChoice && (
+            <div className="bg-amber-900/30 border border-amber-700 rounded-xl p-4">
+              <div className="flex items-start gap-3">
+                <Info size={20} className="text-amber-400 flex-shrink-0 mt-0.5" />
+                <div className="flex-1 min-w-0">
+                  <p className="font-medium text-amber-300 mb-2">
+                    Précision nécessaire
+                  </p>
+                  <p className="text-sm text-amber-200 mb-3">
+                    Cette dépense est-elle déductible fiscalement ?
+                  </p>
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() => handleSplitChoice(true)}
+                      className="flex-1 px-3 py-2 bg-green-600 hover:bg-green-700 text-white text-sm rounded-lg transition-colors"
+                    >
+                      Oui, déductible
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleSplitChoice(false)}
+                      className="flex-1 px-3 py-2 bg-red-600 hover:bg-red-700 text-white text-sm rounded-lg transition-colors"
+                    >
+                      Non, pas déductible
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {deductionStatus === 'CONFIRMED' && (
+            <div className="bg-green-900/30 border border-green-700 rounded-xl p-3">
+              <div className="flex items-center gap-2">
+                <Check size={18} className="text-green-400" />
+                <p className="text-sm text-green-300">
+                  Déduction confirmée : {DEDUCTION_LABELS[deductionType]}
+                </p>
+              </div>
+            </div>
+          )}
 
           <div>
             <label className="block text-sm font-medium text-slate-400 mb-2">Compte</label>
