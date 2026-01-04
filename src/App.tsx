@@ -11,6 +11,7 @@ import { TaxReport } from './pages/TaxReport';
 import { Settings } from './pages/Settings';
 import ImportCsv from './pages/ImportCsv';
 import Accounts from './pages/Accounts';
+import TestAccounts from './pages/TestAccounts';
 
 function App() {
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
@@ -32,6 +33,7 @@ function App() {
           <Route path="/taxes" element={<Taxes />} />
           <Route path="/tax-report" element={<TaxReport />} />
           <Route path="/settings" element={<Settings />} />
+          <Route path="/test-accounts" element={<TestAccounts />} />
         </Routes>
       </Layout>
     </Router>
