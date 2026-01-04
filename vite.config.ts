@@ -9,7 +9,24 @@ export default defineConfig({
   },
   server: {
     watch: {
-      ignored: ['**/node_modules/**', '**/dist/**', '**/.git/**', '**/supabase/migrations/**']
+      ignored: [
+        '**/node_modules/**',
+        '**/dist/**',
+        '**/.git/**',
+        '**/supabase/**',
+        '**/*.log',
+        '**/.env',
+        '**/package-lock.json',
+        '**/*.md'
+      ],
+      usePolling: false
+    },
+    hmr: {
+      overlay: true
     }
+  },
+  build: {
+    outDir: 'dist',
+    emptyOutDir: true
   }
 });
