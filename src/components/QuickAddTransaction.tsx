@@ -108,7 +108,7 @@ export function QuickAddTransaction({
         resetToDefaults();
       }
     }
-  }, [open, editingTransaction, duplicatingTransaction]);
+  }, [open]);
 
   useEffect(() => {
     if (categoryId && type === 'expense') {
