@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react';
 import { BarChart, Bar, PieChart, Pie, Cell, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { supabase } from '../lib/supabase';
 import { formatCHF } from '../lib/utils';
-import { format, startOfMonth, endOfMonth, subMonths } from 'date-fns';
-import { Download } from 'lucide-react';
+import { format, startOfMonth, endOfMonth, subMonths, startOfWeek, endOfWeek, addWeeks } from 'date-fns';
+import { Download, TrendingUp, TrendingDown, Calendar, PieChart as PieChartIcon, Wallet } from 'lucide-react';
 
 const COLORS = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#06b6d4', '#84cc16'];
 
@@ -13,7 +13,9 @@ export function Stats() {
   const [categoryData, setCategoryData] = useState<any[]>([]);
   const [memberData, setMemberData] = useState<any[]>([]);
   const [monthlyData, setMonthlyData] = useState<any[]>([]);
-  const [summary, setSummary] = useState({ income: 0, expenses: 0, balance: 0 });
+  const [weeklyData, setWeeklyData] = useState<any[]>([]);
+  const [fixedVsVariableCosts, setFixedVsVariableCosts] = useState<any[]>([]);
+  const [summary, setSummary] = useState({ income: 0, expenses: 0, balance: 0, fixedCosts: 0, variableCosts: 0 });
 
   useEffect(() => {
     fetchStats();
@@ -52,7 +54,15 @@ export function Stats() {
           .filter(t => t.type === 'expense')
           .reduce((sum, t) => sum + Number(t.amount), 0));
 
-        setSummary({ income, expenses, balance: income - expenses });
+        const fixedCosts = Math.abs(transactions
+          .filter(t => t.type === 'expense' && t.is_fixed)
+          .reduce((sum, t) => sum + Number(t.amount), 0));
+
+        const variableCosts = Math.abs(transactions
+          .filter(t => t.type === 'expense' && !t.is_fixed)
+          .reduce((sum, t) => sum + Number(t.amount), 0));
+
+        setSummary({ income, expenses, balance: income - expenses, fixedCosts, variableCosts });
 
         const categoryMap = new Map<string, { name: string; amount: number; color: string }>();
         transactions
@@ -85,11 +95,11 @@ export function Stats() {
 
         setMemberData(Array.from(memberMap.values()));
 
-        const monthMap = new Map<string, { month: string; income: number; expenses: number }>();
+        const monthMap = new Map<string, { month: string; income: number; expenses: number; fixed: number; variable: number }>();
         for (let i = 11; i >= 0; i--) {
           const date = subMonths(now, i);
           const monthKey = format(date, 'MMM yyyy');
-          monthMap.set(monthKey, { month: monthKey, income: 0, expenses: 0 });
+          monthMap.set(monthKey, { month: monthKey, income: 0, expenses: 0, fixed: 0, variable: 0 });
         }
 
         transactions.forEach(t => {
@@ -99,12 +109,43 @@ export function Stats() {
             if (t.type === 'income') {
               current.income += Number(t.amount);
             } else {
-              current.expenses += Math.abs(Number(t.amount));
+              const amount = Math.abs(Number(t.amount));
+              current.expenses += amount;
+              if (t.is_fixed) {
+                current.fixed += amount;
+              } else {
+                current.variable += amount;
+              }
             }
           }
         });
 
         setMonthlyData(Array.from(monthMap.values()));
+        setFixedVsVariableCosts(Array.from(monthMap.values()).map(m => ({
+          month: m.month,
+          'Coûts fixes': m.fixed,
+          'Coûts variables': m.variable,
+        })));
+
+        const weekMap = new Map<string, { week: string; expenses: number }>();
+        for (let i = 11; i >= 0; i--) {
+          const weekStart = startOfWeek(addWeeks(now, -i), { weekStartsOn: 1 });
+          const weekKey = `Sem. ${format(weekStart, 'w')}`;
+          weekMap.set(weekKey, { week: weekKey, expenses: 0 });
+        }
+
+        transactions
+          .filter(t => t.type === 'expense')
+          .forEach(t => {
+            const weekStart = startOfWeek(new Date(t.date), { weekStartsOn: 1 });
+            const weekKey = `Sem. ${format(weekStart, 'w')}`;
+            const current = weekMap.get(weekKey);
+            if (current) {
+              current.expenses += Math.abs(Number(t.amount));
+            }
+          });
+
+        setWeeklyData(Array.from(weekMap.values()));
       }
     } catch (error) {
       console.error('Erreur chargement statistiques:', error);
@@ -160,21 +201,106 @@ export function Stats() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
         <div className="bg-slate-800 rounded-xl p-6 border border-slate-700">
-          <p className="text-slate-400 text-sm mb-2">Revenus</p>
+          <div className="flex items-center gap-3 mb-3">
+            <div className="p-2 bg-green-600/20 rounded-lg">
+              <TrendingUp className="w-5 h-5 text-green-400" />
+            </div>
+            <p className="text-slate-400 text-sm">Revenus</p>
+          </div>
           <p className="text-2xl font-bold text-green-400">CHF {formatCHF(summary.income)}</p>
         </div>
         <div className="bg-slate-800 rounded-xl p-6 border border-slate-700">
-          <p className="text-slate-400 text-sm mb-2">Dépenses</p>
+          <div className="flex items-center gap-3 mb-3">
+            <div className="p-2 bg-red-600/20 rounded-lg">
+              <TrendingDown className="w-5 h-5 text-red-400" />
+            </div>
+            <p className="text-slate-400 text-sm">Dépenses</p>
+          </div>
           <p className="text-2xl font-bold text-red-400">CHF {formatCHF(summary.expenses)}</p>
         </div>
         <div className="bg-slate-800 rounded-xl p-6 border border-slate-700">
-          <p className="text-slate-400 text-sm mb-2">Solde</p>
+          <div className="flex items-center gap-3 mb-3">
+            <div className="p-2 bg-blue-600/20 rounded-lg">
+              <Wallet className="w-5 h-5 text-blue-400" />
+            </div>
+            <p className="text-slate-400 text-sm">Solde</p>
+          </div>
           <p className={`text-2xl font-bold ${summary.balance >= 0 ? 'text-blue-400' : 'text-red-400'}`}>
             CHF {formatCHF(summary.balance)}
           </p>
         </div>
+        <div className="bg-slate-800 rounded-xl p-6 border border-slate-700">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="p-2 bg-orange-600/20 rounded-lg">
+              <Calendar className="w-5 h-5 text-orange-400" />
+            </div>
+            <p className="text-slate-400 text-sm">Coûts fixes</p>
+          </div>
+          <p className="text-2xl font-bold text-orange-400">CHF {formatCHF(summary.fixedCosts)}</p>
+        </div>
+        <div className="bg-slate-800 rounded-xl p-6 border border-slate-700">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="p-2 bg-cyan-600/20 rounded-lg">
+              <PieChartIcon className="w-5 h-5 text-cyan-400" />
+            </div>
+            <p className="text-slate-400 text-sm">Coûts variables</p>
+          </div>
+          <p className="text-2xl font-bold text-cyan-400">CHF {formatCHF(summary.variableCosts)}</p>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="bg-slate-800 rounded-xl p-6 border border-slate-700">
+          <h2 className="text-xl font-bold mb-4">Dépenses par semaine</h2>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={weeklyData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+              <XAxis dataKey="week" stroke="#9ca3af" />
+              <YAxis stroke="#9ca3af" />
+              <Tooltip
+                contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: '8px' }}
+                formatter={(value: number) => `CHF ${formatCHF(value)}`}
+              />
+              <Bar dataKey="expenses" fill="#3b82f6" name="Dépenses" />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+
+        <div className="bg-slate-800 rounded-xl p-6 border border-slate-700">
+          <h2 className="text-xl font-bold mb-4">Dépenses par mois</h2>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={monthlyData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+              <XAxis dataKey="month" stroke="#9ca3af" />
+              <YAxis stroke="#9ca3af" />
+              <Tooltip
+                contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: '8px' }}
+                formatter={(value: number) => `CHF ${formatCHF(value)}`}
+              />
+              <Bar dataKey="expenses" fill="#ef4444" name="Dépenses" />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
+      <div className="bg-slate-800 rounded-xl p-6 border border-slate-700">
+        <h2 className="text-xl font-bold mb-4">Coûts fixes vs variables par mois</h2>
+        <ResponsiveContainer width="100%" height={300}>
+          <BarChart data={fixedVsVariableCosts}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+            <XAxis dataKey="month" stroke="#9ca3af" />
+            <YAxis stroke="#9ca3af" />
+            <Tooltip
+              contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: '8px' }}
+              formatter={(value: number) => `CHF ${formatCHF(value)}`}
+            />
+            <Legend />
+            <Bar dataKey="Coûts fixes" fill="#f97316" name="Coûts fixes" />
+            <Bar dataKey="Coûts variables" fill="#06b6d4" name="Coûts variables" />
+          </BarChart>
+        </ResponsiveContainer>
       </div>
 
       <div className="bg-slate-800 rounded-xl p-6 border border-slate-700">

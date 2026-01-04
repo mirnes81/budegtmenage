@@ -20,18 +20,18 @@ export function parseCHFInput(value: string): number {
 }
 
 export function getMerchantInitials(merchantName: string): string {
-  if (!merchantName) return '???';
+  if (!merchantName) return '??';
 
   const cleaned = merchantName.trim().toUpperCase();
 
-  if (cleaned.length <= 3) return cleaned;
+  if (cleaned.length <= 2) return cleaned;
 
   const words = cleaned.split(/\s+/);
   if (words.length >= 2) {
-    return words.slice(0, 2).map(w => w[0]).join('') + (words[2]?.[0] || '');
+    return words.slice(0, 2).map(w => w[0]).join('');
   }
 
-  return cleaned.substring(0, 3);
+  return cleaned.substring(0, 2);
 }
 
 export function getMerchantColor(merchantName: string): string {

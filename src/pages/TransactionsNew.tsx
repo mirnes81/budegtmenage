@@ -234,21 +234,11 @@ export function TransactionsNew() {
                       className="bg-slate-800 rounded-xl p-4 border border-slate-700 hover:border-slate-600 transition-colors"
                     >
                       <div className="flex items-start gap-3">
-                        <div className="flex flex-col gap-2 flex-shrink-0">
-                          <div
-                            className="w-12 h-12 rounded-xl flex items-center justify-center overflow-hidden"
-                            style={{
-                              backgroundColor: transaction.categories?.color + '20',
-                            }}
-                          >
-                            <span className="text-xl leading-none">{transaction.categories?.icon || '📄'}</span>
-                          </div>
-                          <div
-                            className="w-12 h-8 rounded-lg flex items-center justify-center font-bold text-[10px] text-white shadow-md"
-                            style={{ backgroundColor: getMerchantColor(transaction.description) }}
-                          >
-                            {getMerchantInitials(transaction.description)}
-                          </div>
+                        <div
+                          className="w-12 h-12 rounded-xl flex items-center justify-center font-bold text-sm text-white shadow-md flex-shrink-0"
+                          style={{ backgroundColor: getMerchantColor(transaction.description) }}
+                        >
+                          {getMerchantInitials(transaction.description)}
                         </div>
 
                         <div className="flex-1 min-w-0 pr-2">
