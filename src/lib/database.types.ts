@@ -142,6 +142,15 @@ export interface Database {
           tags: string[] | null
           is_fixed: boolean
           recurring_expense_id: string | null
+          deduction_type: string
+          deduction_status: string
+          tax_year: number | null
+          merchant_name: string | null
+          receipt_image_url: string | null
+          scanned_at: string | null
+          import_source: string
+          import_line_hash: string | null
+          import_file_id: string | null
           created_at: string
           updated_at: string
         }
@@ -158,6 +167,15 @@ export interface Database {
           tags?: string[] | null
           is_fixed?: boolean
           recurring_expense_id?: string | null
+          deduction_type?: string
+          deduction_status?: string
+          tax_year?: number | null
+          merchant_name?: string | null
+          receipt_image_url?: string | null
+          scanned_at?: string | null
+          import_source?: string
+          import_line_hash?: string | null
+          import_file_id?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -174,6 +192,15 @@ export interface Database {
           tags?: string[] | null
           is_fixed?: boolean
           recurring_expense_id?: string | null
+          deduction_type?: string
+          deduction_status?: string
+          tax_year?: number | null
+          merchant_name?: string | null
+          receipt_image_url?: string | null
+          scanned_at?: string | null
+          import_source?: string
+          import_line_hash?: string | null
+          import_file_id?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -331,6 +358,152 @@ export interface Database {
           month?: number
           transaction_id?: string
           generated_at?: string
+        }
+      }
+      deduction_rules: {
+        Row: {
+          id: string
+          category_id: string
+          deduction_type: string
+          requires_split: boolean
+          split_prompt: string | null
+          notes: string | null
+          is_active: boolean
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          category_id: string
+          deduction_type: string
+          requires_split?: boolean
+          split_prompt?: string | null
+          notes?: string | null
+          is_active?: boolean
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          category_id?: string
+          deduction_type?: string
+          requires_split?: boolean
+          split_prompt?: string | null
+          notes?: string | null
+          is_active?: boolean
+          created_at?: string
+        }
+      }
+      merchant_rules: {
+        Row: {
+          id: string
+          merchant_key: string
+          merchant_display: string
+          category_id: string
+          default_account_id: string
+          default_member_id: string
+          deduction_type: string
+          use_count: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          merchant_key: string
+          merchant_display: string
+          category_id: string
+          default_account_id: string
+          default_member_id: string
+          deduction_type?: string
+          use_count?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          merchant_key?: string
+          merchant_display?: string
+          category_id?: string
+          default_account_id?: string
+          default_member_id?: string
+          deduction_type?: string
+          use_count?: number
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      import_files: {
+        Row: {
+          id: string
+          account_id: string
+          file_name: string
+          file_size: number
+          file_hash: string
+          rows_total: number
+          rows_imported: number
+          rows_skipped: number
+          preset_used: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          account_id: string
+          file_name: string
+          file_size: number
+          file_hash: string
+          rows_total?: number
+          rows_imported?: number
+          rows_skipped?: number
+          preset_used?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          account_id?: string
+          file_name?: string
+          file_size?: number
+          file_hash?: string
+          rows_total?: number
+          rows_imported?: number
+          rows_skipped?: number
+          preset_used?: string | null
+          created_at?: string
+        }
+      }
+      bank_csv_presets: {
+        Row: {
+          id: string
+          name: string
+          match_headers: Json
+          delimiter_hint: string
+          date_format_hint: string
+          decimal_separator_hint: string
+          mapping: Json
+          is_active: boolean
+          order_index: number
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          match_headers?: Json
+          delimiter_hint?: string
+          date_format_hint?: string
+          decimal_separator_hint?: string
+          mapping?: Json
+          is_active?: boolean
+          order_index?: number
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          name?: string
+          match_headers?: Json
+          delimiter_hint?: string
+          date_format_hint?: string
+          decimal_separator_hint?: string
+          mapping?: Json
+          is_active?: boolean
+          order_index?: number
+          created_at?: string
         }
       }
     }

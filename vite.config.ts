@@ -7,4 +7,9 @@ export default defineConfig({
   optimizeDeps: {
     exclude: ['lucide-react'],
   },
+  server: {
+    watch: {
+      ignored: ['**/node_modules/**', '**/dist/**', '**/.git/**', '**/supabase/migrations/**']
+    }
+  }
 });
