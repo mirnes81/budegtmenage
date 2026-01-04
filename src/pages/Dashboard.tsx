@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { TrendingUp, TrendingDown, Wallet, PiggyBank } from 'lucide-react';
 import { supabase } from '../lib/supabase';
-import { formatCHF } from '../lib/utils';
+import { formatCHF, getMerchantInitials, getMerchantColor } from '../lib/utils';
 import { format, startOfMonth, endOfMonth } from 'date-fns';
 import { FAB } from '../components/ui/FAB';
 import { QuickAddTransaction } from '../components/QuickAddTransaction';
@@ -140,13 +140,21 @@ export function Dashboard() {
                 key={index}
                 className="flex items-center gap-3 p-4 bg-slate-700/50 rounded-lg"
               >
-                <div
-                  className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden"
-                  style={{ backgroundColor: transaction.categories?.color + '20' }}
-                >
-                  <span className="text-lg leading-none" style={{ color: transaction.categories?.color }}>
-                    {transaction.categories?.icon}
-                  </span>
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  <div
+                    className="w-11 h-11 rounded-xl flex items-center justify-center overflow-hidden"
+                    style={{ backgroundColor: transaction.categories?.color + '20' }}
+                  >
+                    <span className="text-xl leading-none" style={{ color: transaction.categories?.color }}>
+                      {transaction.categories?.icon}
+                    </span>
+                  </div>
+                  <div
+                    className="w-9 h-9 rounded-lg flex items-center justify-center font-bold text-[10px] text-white shadow-md"
+                    style={{ backgroundColor: getMerchantColor(transaction.description) }}
+                  >
+                    {getMerchantInitials(transaction.description)}
+                  </div>
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="font-medium truncate">{transaction.description}</p>
