@@ -41,17 +41,20 @@ export function ReceiptScanner({ open, onClose, onExtracted }: ReceiptScannerPro
 
       const result = await Tesseract.recognize(
         file,
-        'fra+eng',
+        'fra+eng+deu',
         {
           logger: (m) => {
             if (m.status === 'recognizing text') {
               setProgress(Math.round(m.progress * 100));
             }
           },
+          tessedit_pageseg_mode: Tesseract.PSM.AUTO,
+          tessedit_char_whitelist: '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzàâäéèêëïîôùûüÿœæçÀÂÄÉÈÊËÏÎÔÙÛÜŸŒÆÇ.,-:/() ',
         }
       );
 
       const text = result.data.text;
+      console.log('Texte OCR extrait:', text);
 
       if (!text || text.trim().length < 10) {
         setError('Impossible de lire le ticket. Veuillez réessayer avec une meilleure photo.');
@@ -59,6 +62,7 @@ export function ReceiptScanner({ open, onClose, onExtracted }: ReceiptScannerPro
       }
 
       const extraction = extractReceiptInfo(text);
+      console.log('Extraction:', extraction);
 
       if (!extraction.amount && !extraction.merchantRaw) {
         setError('Aucune information extraite. Veuillez saisir manuellement.');

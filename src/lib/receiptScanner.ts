@@ -91,34 +91,89 @@ export function normalizeMerchant(merchantRaw: string | null): {
 }
 
 export function extractAmountFromText(text: string): number | null {
-  const lines = text.split('\n');
-  const amounts: number[] = [];
+  const lines = text.split('\n').map(l => l.trim());
+  const amounts: { value: number; priority: number; line: string }[] = [];
 
-  const chfPattern = /(?:CHF|Fr\.?|FS)\s*([0-9]{1,6}[',.]?[0-9]{0,3}\.?[0-9]{2})/gi;
-  const totalPattern =
-    /(?:TOTAL|MONTANT|SOMME|BETRAG|SUM|AMOUNT)\s*:?\s*([0-9]{1,6}[',.]?[0-9]{0,3}\.?[0-9]{2})/gi;
+  // Patterns pour les totaux (priorité haute)
+  const totalPatterns = [
+    /(?:TOTAL|MONTANT|SOMME|BETRAG|SUMME|SUM|AMOUNT|GESAMT|ZAHLEN|PAYER|A\s*PAYER|TO\s*PAY)\s*:?\s*(?:CHF|Fr\.?|FS|€|EUR)?\s*([0-9]{1,6}[\s',.]?[0-9]{0,3}[.,][0-9]{2})/gi,
+    /(?:CHF|Fr\.?|FS|€|EUR)\s*([0-9]{1,6}[\s',.]?[0-9]{0,3}[.,][0-9]{2})\s*(?:TOTAL|MONTANT|SOMME|BETRAG)/gi,
+  ];
 
+  // Patterns pour les montants avec devise (priorité moyenne)
+  const currencyPatterns = [
+    /(?:CHF|Fr\.?|FS|€|EUR)\s*([0-9]{1,6}[\s',.]?[0-9]{0,3}[.,][0-9]{2})/gi,
+    /([0-9]{1,6}[\s',.]?[0-9]{0,3}[.,][0-9]{2})\s*(?:CHF|Fr\.?|FS|€|EUR)/gi,
+  ];
+
+  // Pattern général pour les montants (priorité basse)
+  const generalPattern = /\b([0-9]{1,6}[\s',.]?[0-9]{0,3}[.,][0-9]{2})\b/g;
+
+  // Recherche des totaux en priorité
   for (const line of lines) {
-    let match;
+    const lineUpper = line.toUpperCase();
 
-    match = totalPattern.exec(line);
-    if (match) {
-      const amount = parseFloat(match[1].replace(/[',]/g, '').replace(/\./g, '.'));
-      if (!isNaN(amount) && amount > 0) {
-        return amount;
+    // Vérifier si la ligne contient un mot-clé de total
+    if (/TOTAL|MONTANT|SOMME|BETRAG|SUMME|ZAHLEN|PAYER|A\s*PAYER|TO\s*PAY|GESAMT/i.test(lineUpper)) {
+      for (const pattern of totalPatterns) {
+        pattern.lastIndex = 0;
+        let match;
+        while ((match = pattern.exec(line)) !== null) {
+          const cleanAmount = match[1].replace(/[\s',]/g, '').replace(',', '.');
+          const amount = parseFloat(cleanAmount);
+          if (!isNaN(amount) && amount > 0 && amount < 100000) {
+            amounts.push({ value: amount, priority: 100, line });
+          }
+        }
       }
     }
+  }
 
-    while ((match = chfPattern.exec(line)) !== null) {
-      const amount = parseFloat(match[1].replace(/[',]/g, '').replace(/\./g, '.'));
-      if (!isNaN(amount) && amount > 0) {
-        amounts.push(amount);
+  // Si on a trouvé un total, le retourner
+  if (amounts.length > 0) {
+    return amounts.sort((a, b) => b.priority - a.priority)[0].value;
+  }
+
+  // Chercher les montants avec devise
+  for (const line of lines) {
+    for (const pattern of currencyPatterns) {
+      pattern.lastIndex = 0;
+      let match;
+      while ((match = pattern.exec(line)) !== null) {
+        const cleanAmount = match[1].replace(/[\s',]/g, '').replace(',', '.');
+        const amount = parseFloat(cleanAmount);
+        if (!isNaN(amount) && amount > 0 && amount < 100000) {
+          amounts.push({ value: amount, priority: 50, line });
+        }
+      }
+    }
+  }
+
+  // Si on a trouvé des montants avec devise, prendre le plus grand
+  if (amounts.length > 0) {
+    const sorted = amounts.sort((a, b) => b.value - a.value);
+    return sorted[0].value;
+  }
+
+  // Dernier recours: chercher des patterns numériques généraux
+  for (const line of lines) {
+    generalPattern.lastIndex = 0;
+    let match;
+    while ((match = generalPattern.exec(line)) !== null) {
+      const cleanAmount = match[1].replace(/[\s',]/g, '').replace(',', '.');
+      const amount = parseFloat(cleanAmount);
+      if (!isNaN(amount) && amount > 0.50 && amount < 100000) {
+        amounts.push({ value: amount, priority: 10, line });
       }
     }
   }
 
   if (amounts.length > 0) {
-    return Math.max(...amounts);
+    const sorted = amounts.sort((a, b) => {
+      if (a.priority !== b.priority) return b.priority - a.priority;
+      return b.value - a.value;
+    });
+    return sorted[0].value;
   }
 
   return null;
@@ -158,18 +213,97 @@ export function extractDateFromText(text: string): string | null {
 }
 
 export function extractMerchantFromText(text: string): string | null {
-  const lines = text.split('\n').filter((l) => l.trim().length > 0);
+  const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
 
   if (lines.length === 0) return null;
 
-  for (let i = 0; i < Math.min(5, lines.length); i++) {
+  // Mots à ignorer (communs sur les tickets mais pas des noms de magasins)
+  const ignoreWords = /^(ticket|reçu|receipt|kassenbon|bon|caisse|magasin|filiale|succursale|tel|fax|email|www|http|date|heure|time|merci|danke|thank|bienvenue|welcome|\d+)$/i;
+
+  // Patterns à éviter (lignes qui contiennent ces éléments ne sont probablement pas le nom)
+  const avoidPatterns = [
+    /^\d+$/,                           // Uniquement des chiffres
+    /^[0-9\s\-\.\(\)\/]+$/,           // Numéros de téléphone, dates
+    /^\*+$/,                           // Séparateurs
+    /^[\-=_]+$/,                       // Séparateurs
+    /TVA|VAT|MWST|TAX/i,              // Lignes de taxes
+    /^\s*$/,                           // Lignes vides
+    /@|\.com|\.ch|\.fr|\.de/i,        // Emails/sites web
+  ];
+
+  const candidates: { text: string; score: number; index: number }[] = [];
+
+  // Analyser les 10 premières lignes
+  for (let i = 0; i < Math.min(10, lines.length); i++) {
     const line = lines[i].trim();
-    if (line.length >= 3 && line.length <= 50 && !/^[0-9\s]+$/.test(line)) {
-      return line;
+
+    // Ignorer les lignes trop courtes ou trop longues
+    if (line.length < 2 || line.length > 60) continue;
+
+    // Ignorer les patterns à éviter
+    if (avoidPatterns.some(pattern => pattern.test(line))) continue;
+
+    // Ignorer les mots à ignorer
+    if (ignoreWords.test(line)) continue;
+
+    let score = 0;
+
+    // Plus de points si c'est dans les premières lignes
+    score += (10 - i) * 10;
+
+    // Plus de points si la ligne contient des mots connus de marchands suisses
+    const lineUpper = line.toUpperCase();
+    const knownMerchants = Object.keys(SWISS_MERCHANTS);
+    for (const merchant of knownMerchants) {
+      if (lineUpper.includes(merchant)) {
+        score += 100;
+        break;
+      }
     }
+
+    // Plus de points si la ligne contient des lettres majuscules (noms de magasins souvent en caps)
+    const upperCount = (line.match(/[A-Z]/g) || []).length;
+    if (upperCount >= line.length * 0.5) {
+      score += 20;
+    }
+
+    // Moins de points si beaucoup de chiffres
+    const digitCount = (line.match(/[0-9]/g) || []).length;
+    if (digitCount > line.length * 0.3) {
+      score -= 30;
+    }
+
+    // Plus de points si longueur raisonnable pour un nom de magasin
+    if (line.length >= 3 && line.length <= 25) {
+      score += 15;
+    }
+
+    // Moins de points si contient des symboles étranges
+    if (/[<>{}[\]\\|~`]/.test(line)) {
+      score -= 20;
+    }
+
+    // Plus de points si contient des espaces (noms composés comme "Manor Food")
+    const wordCount = line.split(/\s+/).length;
+    if (wordCount >= 2 && wordCount <= 4) {
+      score += 10;
+    }
+
+    candidates.push({ text: line, score, index: i });
   }
 
-  return lines[0];
+  // Trier par score
+  candidates.sort((a, b) => {
+    if (b.score !== a.score) return b.score - a.score;
+    return a.index - b.index; // En cas d'égalité, prendre le plus haut
+  });
+
+  if (candidates.length > 0 && candidates[0].score > 0) {
+    return candidates[0].text;
+  }
+
+  // Fallback: première ligne non vide
+  return lines[0] || null;
 }
 
 export function extractReceiptInfo(text: string): ReceiptExtraction {
