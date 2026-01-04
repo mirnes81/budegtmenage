@@ -375,7 +375,7 @@ export function QuickAddTransaction({
             : 'Nouvelle transaction'
         }
       >
-        <form onSubmit={(e) => { e.preventDefault(); handleSave(); }} className="space-y-6">
+        <form onSubmit={(e) => { e.preventDefault(); handleSave(); }} className="space-y-6 pb-6">
           <div>
             <input
               type="number"
@@ -667,7 +667,7 @@ export function QuickAddTransaction({
           <button
             type="submit"
             disabled={saving}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-4 rounded-xl transition-colors disabled:opacity-50"
+            className="w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold py-4 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98] touch-manipulation text-lg shadow-lg"
           >
             {saving
               ? 'Enregistrement...'

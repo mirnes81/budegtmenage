@@ -115,10 +115,10 @@ export function Picker({
       <button
         key={item.id}
         onClick={() => handleSelect(item.id)}
-        className={`w-full flex items-center gap-4 p-4 rounded-xl transition-colors ${
+        className={`w-full flex items-center gap-4 p-4 rounded-xl transition-all active:scale-[0.98] touch-manipulation ${
           isSelected
-            ? 'bg-blue-600 text-white'
-            : 'bg-slate-700 hover:bg-slate-600 text-white'
+            ? 'bg-blue-600 text-white shadow-lg'
+            : 'bg-slate-700 hover:bg-slate-600 active:bg-slate-500 text-white'
         }`}
       >
         <div
