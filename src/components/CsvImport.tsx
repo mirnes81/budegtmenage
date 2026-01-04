@@ -398,15 +398,15 @@ export default function CsvImport({ onClose, onSuccess }: CsvImportProps) {
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
-        <div className="px-6 py-4 border-b flex items-center justify-between">
-          <h2 className="text-xl font-semibold">Import CSV Bank Statement</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+      <div className="bg-slate-800 rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col border border-slate-700">
+        <div className="px-6 py-4 border-b border-slate-700 flex items-center justify-between">
+          <h2 className="text-xl font-semibold text-white">Import CSV Bank Statement</h2>
+          <button onClick={onClose} className="text-slate-400 hover:text-slate-300">
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        <div className="px-6 py-4 border-b">
+        <div className="px-6 py-4 border-b border-slate-700">
           <div className="flex items-center justify-between">
             {(['upload', 'detect', 'mapping', 'result'] as Step[]).map((s, i) => (
               <div key={s} className="flex items-center">
@@ -416,16 +416,16 @@ export default function CsvImport({ onClose, onSuccess }: CsvImportProps) {
                       ? 'bg-blue-600 text-white'
                       : i < ['upload', 'detect', 'mapping', 'result'].indexOf(step)
                       ? 'bg-green-600 text-white'
-                      : 'bg-gray-200 text-gray-500'
+                      : 'bg-slate-700 text-slate-400'
                   }`}
                 >
                   {i + 1}
                 </div>
-                {i < 3 && <div className="w-16 h-0.5 bg-gray-200 mx-2" />}
+                {i < 3 && <div className="w-16 h-0.5 bg-slate-700 mx-2" />}
               </div>
             ))}
           </div>
-          <div className="flex justify-between mt-2 text-sm text-gray-600">
+          <div className="flex justify-between mt-2 text-sm text-slate-400">
             <span>Upload</span>
             <span>Detect</span>
             <span>Mapping</span>
@@ -505,17 +505,17 @@ function UploadStep({
   return (
     <div className="space-y-6">
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-slate-300 mb-2">
           Selectionner le compte
         </label>
         {accounts.length === 0 ? (
-          <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-            <p className="text-sm text-yellow-800 mb-2">
+          <div className="p-4 bg-yellow-900/20 border border-yellow-700 rounded-lg">
+            <p className="text-sm text-yellow-200 mb-2">
               Vous n'avez pas encore de compte. Creez d'abord un compte pour continuer.
             </p>
             <a
               href="/accounts"
-              className="inline-block text-sm font-medium text-blue-600 hover:text-blue-700"
+              className="inline-block text-sm font-medium text-blue-400 hover:text-blue-300"
             >
               Aller a la page Comptes →
             </a>
@@ -524,7 +524,7 @@ function UploadStep({
           <select
             value={selectedAccount}
             onChange={(e) => onAccountChange(e.target.value)}
-            className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-400"
+            className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 bg-slate-700 border-slate-600 text-white"
           >
             <option value="">Choisir un compte...</option>
             {accounts.map(account => (
@@ -537,11 +537,11 @@ function UploadStep({
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-slate-300 mb-2">
           Selectionner le fichier CSV
         </label>
-        <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-400 transition-colors">
-          <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+        <div className="border-2 border-dashed border-slate-600 rounded-lg p-8 text-center hover:border-blue-500 transition-colors">
+          <Upload className="w-12 h-12 text-slate-400 mx-auto mb-4" />
           <input
             type="file"
             accept=".csv"
@@ -551,19 +551,19 @@ function UploadStep({
           />
           <label
             htmlFor="csv-upload"
-            className="cursor-pointer text-blue-600 hover:text-blue-700 font-medium"
+            className="cursor-pointer text-blue-400 hover:text-blue-300 font-medium"
           >
             Choisir un fichier
           </label>
-          <p className="text-sm text-gray-500 mt-2">ou glisser-deposer</p>
+          <p className="text-sm text-slate-400 mt-2">ou glisser-deposer</p>
         </div>
 
         {file && (
-          <div className="mt-4 flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-            <FileText className="w-5 h-5 text-blue-600" />
+          <div className="mt-4 flex items-center gap-3 p-3 bg-slate-700 rounded-lg">
+            <FileText className="w-5 h-5 text-blue-400" />
             <div className="flex-1">
-              <p className="font-medium">{file.name}</p>
-              <p className="text-sm text-gray-500">
+              <p className="font-medium text-white">{file.name}</p>
+              <p className="text-sm text-slate-400">
                 {(file.size / 1024).toFixed(2)} KB
               </p>
             </div>
@@ -572,16 +572,16 @@ function UploadStep({
       </div>
 
       {error && (
-        <div className="flex items-start gap-2 p-3 bg-red-50 border border-red-200 rounded-lg">
-          <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-          <p className="text-sm text-red-700">{error}</p>
+        <div className="flex items-start gap-2 p-3 bg-red-900/20 border border-red-700 rounded-lg">
+          <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
+          <p className="text-sm text-red-200">{error}</p>
         </div>
       )}
 
       <button
         onClick={onAnalyze}
         disabled={!file || !selectedAccount || loading}
-        className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed"
+        className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:bg-slate-600 disabled:cursor-not-allowed disabled:text-slate-400"
       >
         {loading ? 'Analyse en cours...' : 'Analyser le fichier'}
       </button>
@@ -602,53 +602,53 @@ function DetectStep({
 }) {
   return (
     <div className="space-y-6">
-      <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-        <h3 className="font-medium text-blue-900 dark:text-blue-100 mb-2">Detection Results</h3>
+      <div className="bg-blue-900/20 border border-blue-800 rounded-lg p-4">
+        <h3 className="font-medium text-blue-100 mb-2">Detection Results</h3>
         <div className="space-y-2 text-sm">
           <div className="flex justify-between">
-            <span className="text-blue-700 dark:text-blue-300">Delimiter:</span>
-            <span className="font-mono text-blue-900 dark:text-blue-100">{csvData.delimiter}</span>
+            <span className="text-blue-300">Delimiter:</span>
+            <span className="font-mono text-blue-100">{csvData.delimiter}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-blue-700 dark:text-blue-300">Date Format:</span>
-            <span className="font-mono text-blue-900 dark:text-blue-100">{csvData.dateFormat || 'Unknown'}</span>
+            <span className="text-blue-300">Date Format:</span>
+            <span className="font-mono text-blue-100">{csvData.dateFormat || 'Unknown'}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-blue-700 dark:text-blue-300">Decimal Separator:</span>
-            <span className="font-mono text-blue-900 dark:text-blue-100">{csvData.decimalSeparator}</span>
+            <span className="text-blue-300">Decimal Separator:</span>
+            <span className="font-mono text-blue-100">{csvData.decimalSeparator}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-blue-700 dark:text-blue-300">Bank Preset:</span>
-            <span className="font-semibold text-blue-900 dark:text-blue-100">{preset?.name || 'Generic'}</span>
+            <span className="text-blue-300">Bank Preset:</span>
+            <span className="font-semibold text-blue-100">{preset?.name || 'Generic'}</span>
           </div>
         </div>
       </div>
 
       {duplicateWarning && (
-        <div className="flex items-start gap-2 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
-          <AlertCircle className="w-5 h-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5" />
-          <p className="text-sm text-yellow-700 dark:text-yellow-300">{duplicateWarning}</p>
+        <div className="flex items-start gap-2 p-3 bg-yellow-900/20 border border-yellow-800 rounded-lg">
+          <AlertCircle className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
+          <p className="text-sm text-yellow-300">{duplicateWarning}</p>
         </div>
       )}
 
       <div>
-        <h3 className="font-medium mb-2 dark:text-white">Preview (first 20 rows)</h3>
-        <div className="overflow-x-auto border dark:border-gray-700 rounded-lg">
-          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 text-sm">
-            <thead className="bg-gray-50 dark:bg-gray-800">
+        <h3 className="font-medium mb-2 text-white">Preview (first 20 rows)</h3>
+        <div className="overflow-x-auto border border-slate-700 rounded-lg">
+          <table className="min-w-full divide-y divide-slate-700 text-sm">
+            <thead className="bg-slate-800">
               <tr>
                 {csvData.headers.map((header, i) => (
-                  <th key={i} className="px-3 py-2 text-left font-medium text-gray-700 dark:text-gray-300">
+                  <th key={i} className="px-3 py-2 text-left font-medium text-slate-300">
                     {header}
                   </th>
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-900">
+            <tbody className="divide-y divide-slate-700 bg-slate-900">
               {csvData.rows.map((row, i) => (
-                <tr key={i} className="hover:bg-gray-50 dark:hover:bg-gray-800">
+                <tr key={i} className="hover:bg-slate-800">
                   {row.map((cell, j) => (
-                    <td key={j} className="px-3 py-2 text-gray-900 dark:text-gray-100">
+                    <td key={j} className="px-3 py-2 text-slate-100">
                       {cell}
                     </td>
                   ))}
@@ -661,7 +661,7 @@ function DetectStep({
 
       <button
         onClick={onNext}
-        className="w-full bg-blue-600 dark:bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600"
+        className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
       >
         Next: Configure Mapping
       </button>
@@ -703,14 +703,14 @@ function MappingStep({
   return (
     <div className="space-y-6">
       <div>
-        <h3 className="font-medium mb-4">Column Mapping</h3>
+        <h3 className="font-medium mb-4 text-white">Column Mapping</h3>
         <div className="space-y-3">
           {Object.entries(mapping).map(([field, value]) => (
             <div key={field} className="flex items-center gap-3">
-              <label className="w-32 text-sm font-medium text-gray-700 capitalize">
+              <label className="w-32 text-sm font-medium text-slate-300 capitalize">
                 {field.replace(/([A-Z])/g, ' $1').trim()}
                 {['date', 'description'].includes(field) && (
-                  <span className="text-red-500">*</span>
+                  <span className="text-red-400">*</span>
                 )}
               </label>
               <select
@@ -718,7 +718,7 @@ function MappingStep({
                 onChange={(e) =>
                   onMappingChange({ ...mapping, [field]: e.target.value || null })
                 }
-                className="flex-1 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-400"
+                className="flex-1 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 bg-slate-700 border-slate-600 text-white"
               >
                 <option value="">Not mapped</option>
                 {headers.map(header => (
@@ -731,7 +731,7 @@ function MappingStep({
           ))}
         </div>
         {!validation.valid && (
-          <div className="mt-3 text-sm text-red-600">
+          <div className="mt-3 text-sm text-red-400">
             {validation.errors.map((err, i) => (
               <p key={i}>{err}</p>
             ))}
@@ -741,13 +741,13 @@ function MappingStep({
 
       <div className="space-y-3">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-slate-300 mb-2">
             Default Member
           </label>
           <select
             value={selectedMember}
             onChange={(e) => onMemberChange(e.target.value)}
-            className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-400"
+            className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 bg-slate-700 border-slate-600 text-white"
           >
             {members.map(member => (
               <option key={member.id} value={member.id}>
@@ -764,7 +764,7 @@ function MappingStep({
             onChange={(e) => onApplyMerchantRulesChange(e.target.checked)}
             className="rounded"
           />
-          <span className="text-sm text-gray-700">Apply merchant rules (auto-categorize)</span>
+          <span className="text-sm text-slate-300">Apply merchant rules (auto-categorize)</span>
         </label>
 
         <label className="flex items-center gap-2">
@@ -774,21 +774,21 @@ function MappingStep({
             onChange={(e) => onSaveMappingChange(e.target.checked)}
             className="rounded"
           />
-          <span className="text-sm text-gray-700">Remember this mapping</span>
+          <span className="text-sm text-slate-300">Remember this mapping</span>
         </label>
       </div>
 
       {error && (
-        <div className="flex items-start gap-2 p-3 bg-red-50 border border-red-200 rounded-lg">
-          <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-          <p className="text-sm text-red-700">{error}</p>
+        <div className="flex items-start gap-2 p-3 bg-red-900/20 border border-red-700 rounded-lg">
+          <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
+          <p className="text-sm text-red-200">{error}</p>
         </div>
       )}
 
       <button
         onClick={onImport}
         disabled={!validation.valid || loading}
-        className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed"
+        className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:bg-slate-600 disabled:cursor-not-allowed disabled:text-slate-400"
       >
         {loading ? 'Importing...' : 'Import Transactions'}
       </button>
@@ -799,32 +799,32 @@ function MappingStep({
 function ResultStep({ result, onFinish }: { result: ImportResult; onFinish: () => void }) {
   return (
     <div className="space-y-6 text-center">
-      <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full">
-        <CheckCircle2 className="w-8 h-8 text-green-600" />
+      <div className="inline-flex items-center justify-center w-16 h-16 bg-green-900/20 rounded-full">
+        <CheckCircle2 className="w-8 h-8 text-green-400" />
       </div>
 
       <div>
-        <h3 className="text-xl font-semibold mb-2">Import Complete</h3>
+        <h3 className="text-xl font-semibold mb-2 text-white">Import Complete</h3>
         <div className="space-y-2">
-          <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-            <span className="text-gray-700">Total Rows:</span>
-            <span className="font-semibold">{result.total}</span>
+          <div className="flex justify-between items-center p-3 bg-slate-700 rounded-lg">
+            <span className="text-slate-300">Total Rows:</span>
+            <span className="font-semibold text-white">{result.total}</span>
           </div>
-          <div className="flex justify-between items-center p-3 bg-green-50 rounded-lg">
-            <span className="text-green-700">Imported:</span>
-            <span className="font-semibold text-green-900">{result.imported}</span>
+          <div className="flex justify-between items-center p-3 bg-green-900/20 rounded-lg">
+            <span className="text-green-300">Imported:</span>
+            <span className="font-semibold text-green-100">{result.imported}</span>
           </div>
-          <div className="flex justify-between items-center p-3 bg-yellow-50 rounded-lg">
-            <span className="text-yellow-700">Skipped (duplicates):</span>
-            <span className="font-semibold text-yellow-900">{result.skipped}</span>
+          <div className="flex justify-between items-center p-3 bg-yellow-900/20 rounded-lg">
+            <span className="text-yellow-300">Skipped (duplicates):</span>
+            <span className="font-semibold text-yellow-100">{result.skipped}</span>
           </div>
         </div>
       </div>
 
       {result.errors.length > 0 && (
         <div className="text-left">
-          <h4 className="font-medium text-red-900 mb-2">Errors:</h4>
-          <div className="max-h-40 overflow-y-auto bg-red-50 border border-red-200 rounded-lg p-3 text-sm text-red-700">
+          <h4 className="font-medium text-red-100 mb-2">Errors:</h4>
+          <div className="max-h-40 overflow-y-auto bg-red-900/20 border border-red-700 rounded-lg p-3 text-sm text-red-200">
             {result.errors.map((err, i) => (
               <p key={i}>{err}</p>
             ))}
