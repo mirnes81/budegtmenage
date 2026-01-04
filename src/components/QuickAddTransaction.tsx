@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { format } from 'date-fns';
-import { ChevronRight, Calendar, Info, Check, X } from 'lucide-react';
+import { ChevronRight, Calendar, Info, Check, X, Camera } from 'lucide-react';
 import { Sheet } from './ui/Sheet';
 import { Picker } from './ui/Picker';
+import { ReceiptScanner } from './ReceiptScanner';
 import { supabase } from '../lib/supabase';
 import { useMembers, useAccounts, useCategories } from '../hooks/useSupabase';
 import {
@@ -16,6 +17,7 @@ import {
   DeductionSuggestion,
   DEDUCTION_LABELS,
 } from '../lib/taxDeductions';
+import { ReceiptExtraction, MerchantRule, suggestDeductionType } from '../lib/receiptScanner';
 
 interface QuickAddTransactionProps {
   open: boolean;
@@ -75,6 +77,12 @@ export function QuickAddTransaction({
   const [showSplitChoice, setShowSplitChoice] = useState(false);
 
   const [saving, setSaving] = useState(false);
+
+  const [showScanner, setShowScanner] = useState(false);
+  const [scannedData, setScannedData] = useState<ReceiptExtraction | null>(null);
+  const [merchantRule, setMerchantRule] = useState<MerchantRule | null>(null);
+  const [rememberMerchant, setRememberMerchant] = useState(true);
+  const [showMerchantInfo, setShowMerchantInfo] = useState(false);
 
   useEffect(() => {
     if (open) {
@@ -153,6 +161,98 @@ export function QuickAddTransaction({
     setDeductionSuggestion(null);
   };
 
+  const handleReceiptExtracted = async (extraction: ReceiptExtraction) => {
+    setScannedData(extraction);
+
+    if (extraction.amount) {
+      setAmount(extraction.amount.toString());
+    }
+
+    if (extraction.date) {
+      setDate(extraction.date);
+    }
+
+    if (extraction.merchantRaw) {
+      setDescription(extraction.merchantRaw);
+    }
+
+    if (extraction.merchantKey) {
+      const rule = await findMerchantRule(extraction.merchantKey);
+      if (rule) {
+        setMerchantRule(rule);
+        if (rule.category_id) setCategoryId(rule.category_id);
+        if (rule.default_account_id) setAccountId(rule.default_account_id);
+        if (rule.default_member_id) setMemberId(rule.default_member_id);
+        if (rule.deduction_type) {
+          setDeductionType(rule.deduction_type as DeductionType);
+          setDeductionStatus('CONFIRMED');
+        }
+        setShowMerchantInfo(false);
+      } else {
+        setShowMerchantInfo(extraction.confidence < 60);
+
+        const suggestedDeduction = suggestDeductionType(extraction.merchantKey);
+        if (suggestedDeduction) {
+          setDeductionType(suggestedDeduction as DeductionType);
+          setDeductionStatus('SUGGESTED');
+        }
+      }
+    }
+  };
+
+  const findMerchantRule = async (merchantKey: string): Promise<MerchantRule | null> => {
+    try {
+      const { data, error } = await supabase
+        .from('merchant_rules')
+        .select('*')
+        .eq('merchant_key', merchantKey)
+        .maybeSingle();
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error('Erreur recherche merchant rule:', error);
+      return null;
+    }
+  };
+
+  const saveMerchantRule = async () => {
+    if (!scannedData?.merchantKey || !scannedData?.merchantRaw) return;
+
+    try {
+      const ruleData = {
+        merchant_key: scannedData.merchantKey,
+        merchant_display: scannedData.merchantRaw,
+        category_id: categoryId || null,
+        default_account_id: accountId || null,
+        default_member_id: memberId || null,
+        deduction_type: deductionType !== 'NONE' ? deductionType : null,
+        use_count: 1,
+      };
+
+      const { data: existing } = await supabase
+        .from('merchant_rules')
+        .select('id, use_count')
+        .eq('merchant_key', scannedData.merchantKey)
+        .maybeSingle();
+
+      if (existing) {
+        await supabase
+          .from('merchant_rules')
+          .update({
+            ...ruleData,
+            use_count: existing.use_count + 1,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', existing.id);
+      } else {
+        await supabase.from('merchant_rules').insert([ruleData]);
+      }
+    } catch (error) {
+      console.error('Erreur sauvegarde merchant rule:', error);
+    }
+  };
+
   const resetToDefaults = () => {
     const defaults = getTransactionDefaults();
 
@@ -211,6 +311,10 @@ export function QuickAddTransaction({
         deduction_type: deductionType,
         deduction_status: deductionStatus,
         tax_year: taxYear,
+        merchant_raw: scannedData?.merchantRaw || null,
+        merchant_key: scannedData?.merchantKey || null,
+        raw_text_snippet: scannedData?.rawTextSnippet || null,
+        scanned_at: scannedData ? new Date().toISOString() : null,
       };
 
       if (editingTransaction) {
@@ -233,9 +337,17 @@ export function QuickAddTransaction({
         });
       }
 
+      if (rememberMerchant && scannedData && !editingTransaction) {
+        await saveMerchantRule();
+      }
+
       onSuccess();
       onClose();
       resetToDefaults();
+      setScannedData(null);
+      setMerchantRule(null);
+      setRememberMerchant(true);
+      setShowMerchantInfo(false);
     } catch (error) {
       console.error('Erreur sauvegarde transaction:', error);
       alert('Erreur lors de la sauvegarde');
@@ -302,6 +414,45 @@ export function QuickAddTransaction({
               Revenu
             </button>
           </div>
+
+          {!editingTransaction && !duplicatingTransaction && (
+            <button
+              type="button"
+              onClick={() => setShowScanner(true)}
+              className="w-full flex items-center justify-center gap-2 bg-slate-700 hover:bg-slate-600 px-4 py-3 rounded-xl transition-colors"
+            >
+              <Camera size={20} />
+              <span>Scanner un ticket</span>
+            </button>
+          )}
+
+          {showMerchantInfo && scannedData && (
+            <div className="bg-amber-900/30 border border-amber-700 rounded-xl p-4">
+              <div className="flex gap-3">
+                <Info className="text-amber-400 flex-shrink-0" size={20} />
+                <div className="text-xs md:text-sm">
+                  <p className="text-amber-300 font-medium mb-1">Fournisseur non reconnu</p>
+                  <p className="text-amber-200/80">
+                    Choisis la catégorie une fois, l'app s'en souviendra pour {scannedData.merchantRaw}.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {merchantRule && (
+            <div className="bg-green-900/30 border border-green-700 rounded-xl p-4">
+              <div className="flex gap-3">
+                <Check className="text-green-400 flex-shrink-0" size={20} />
+                <div className="text-xs md:text-sm">
+                  <p className="text-green-300 font-medium">Fournisseur reconnu</p>
+                  <p className="text-green-200/80">
+                    {merchantRule.merchant_display} - Utilisé {merchantRule.use_count} fois
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
 
           <div>
             <label className="block text-sm font-medium text-slate-400 mb-2">
@@ -498,6 +649,21 @@ export function QuickAddTransaction({
             />
           </div>
 
+          {scannedData && !editingTransaction && (
+            <div className="flex items-center gap-3 p-4 bg-slate-700/50 rounded-xl">
+              <input
+                type="checkbox"
+                id="remember-merchant"
+                checked={rememberMerchant}
+                onChange={(e) => setRememberMerchant(e.target.checked)}
+                className="w-5 h-5 rounded border-slate-600 bg-slate-700 text-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-offset-0"
+              />
+              <label htmlFor="remember-merchant" className="flex-1 text-sm text-white cursor-pointer">
+                Mémoriser ce fournisseur ({scannedData.merchantRaw})
+              </label>
+            </div>
+          )}
+
           <button
             type="submit"
             disabled={saving}
@@ -511,6 +677,12 @@ export function QuickAddTransaction({
           </button>
         </form>
       </Sheet>
+
+      <ReceiptScanner
+        open={showScanner}
+        onClose={() => setShowScanner(false)}
+        onExtracted={handleReceiptExtracted}
+      />
 
       <Picker
         open={showCategoryPicker}

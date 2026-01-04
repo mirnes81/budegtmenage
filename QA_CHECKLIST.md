@@ -311,6 +311,39 @@
 - [x] **items-start** au lieu de items-center pour éviter étirement
 - [x] **flex-1 md:flex-none** sur selects pour remplir largeur mobile
 
+## Scan de Tickets + Apprentissage Fournisseur (Janvier 2026)
+### Fonctionnalités scan
+- [x] **Bouton scan** - Dans QuickAddTransaction
+- [x] **OCR local** - Tesseract.js (français + anglais)
+- [x] **Extraction automatique** - Montant, date, fournisseur
+- [x] **Normalisation merchant** - 15+ fournisseurs suisses reconnus
+- [x] **Privacy** - Images jamais sauvegardées, traitement local uniquement
+
+### Apprentissage automatique (Merchant Rules)
+- [x] **Table merchant_rules** - Migration appliquée avec RLS
+- [x] **Détection fournisseur** - merchantKey unique par user
+- [x] **Pré-remplissage auto** - Catégorie, compte, membre mémorisés
+- [x] **Toggle mémorisation** - ON par défaut, désactivable
+- [x] **Incrémentation usage** - use_count++ à chaque utilisation
+- [x] **Intégration déductions** - Suggestions auto (pharmacies→HEALTH, transport→TRANSPORT)
+
+### UI/UX scan
+- [x] **Encart privacy** - "Images non sauvegardées"
+- [x] **Barre progression** - 0-100% pendant OCR
+- [x] **Indicateur fournisseur reconnu** - Encart vert avec compteur
+- [x] **Indicateur fournisseur inconnu** - Encart orange avec explication
+- [x] **Vérification champs** - Tous éditables avant enregistrement
+
+### Tests scan
+- [x] **26 tests unitaires** - receiptScanner.test.ts
+- [x] **normalizeMerchant** - 6 tests (Coop, Migros, pharmacies, inconnus)
+- [x] **extractAmount** - 6 tests (TOTAL, CHF, formats suisses)
+- [x] **extractDate** - 5 tests (formats variés, fallback)
+- [x] **extractMerchant** - 3 tests
+- [x] **extractReceiptInfo** - 2 tests (complet, partiel)
+- [x] **suggestDeductionType** - 4 tests
+- [x] **Total tests** - 56/56 passent ✅
+
 ## Notes
 - Application complète et fonctionnelle
 - Toutes les pages principales implémentées
@@ -319,10 +352,12 @@
 - Estimation impôts basique mais fonctionnelle
 - **Déductions fiscales VD avec suggestions automatiques**
 - **Rapport fiscal avec agrégation et export CSV**
+- **Scan de tickets avec apprentissage automatique fournisseur**
+- **Privacy by design: aucune image sauvegardée**
 - Format CHF suisse respecté
 - Dark mode par défaut
 - **Responsive mobile et desktop - optimisé janvier 2026**
-- Tests unitaires passent (30/30)
-- Build réussi (832 KB / 248 KB gzipped)
+- Tests unitaires passent (56/56) ✅
+- Build réussi (862 KB / 258 KB gzipped)
 - **UX premium style FocusDaily implémentée**
 - **Problèmes d'affichage mobile corrigés (débordement texte, emojis)**
