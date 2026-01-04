@@ -8,8 +8,7 @@ import {
   parseCsv,
   detectFormat,
   parseAmount,
-  generateFileHash,
-  normalizeDescription
+  generateFileHash
 } from '../lib/csvParser';
 import {
   loadBankPresets,
@@ -21,17 +20,15 @@ import {
 } from '../lib/bankPresets';
 import {
   generateLineHash,
-  checkDuplicateFile,
-  saveImportFile
+  checkDuplicateFile
 } from '../lib/importDeduplication';
 import {
-  cleanBankDescription,
   normalizeMerchant,
-  categorizeBySuissKeywords,
   extractMerchantFromUBS
 } from '../lib/bankDescriptionCleaner';
+import QuickCategorization from './QuickCategorization';
 
-type Step = 'upload' | 'detect' | 'mapping' | 'result';
+type Step = 'upload' | 'detect' | 'mapping' | 'result' | 'categorize';
 
 interface ParsedCsvData {
   headers: string[];
@@ -93,6 +90,7 @@ export default function CsvImport({ onClose, onSuccess }: CsvImportProps) {
   const [saveMapping, setSaveMapping] = useState(true);
 
   const [importResult, setImportResult] = useState<ImportResult | null>(null);
+  const [importFileId, setImportFileId] = useState<string>('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>('');
   const [duplicateFileWarning, setDuplicateFileWarning] = useState<string>('');
@@ -239,6 +237,36 @@ export default function CsvImport({ onClose, onSuccess }: CsvImportProps) {
         return;
       }
 
+      const { data: keywordRules } = await supabase
+        .from('keyword_rules')
+        .select('pattern, category_id, priority')
+        .eq('is_active', true)
+        .order('priority');
+
+      const { data: importFileRecord, error: importFileError } = await supabase
+        .from('import_files')
+        .insert({
+          account_id: selectedAccount,
+          file_name: file.name,
+          file_size: file.size,
+          file_hash: fileHash,
+          rows_total: parsed.rows.length,
+          rows_imported: 0,
+          rows_skipped: 0,
+          preset_used: detectedPreset?.name
+        })
+        .select()
+        .single();
+
+      if (importFileError || !importFileRecord) {
+        setError('Failed to create import record: ' + (importFileError?.message || 'Unknown error'));
+        setLoading(false);
+        return;
+      }
+
+      const fileId = importFileRecord.id;
+      setImportFileId(fileId);
+
       let imported = 0;
       let skipped = 0;
       const errors: string[] = [];
@@ -327,14 +355,14 @@ export default function CsvImport({ onClose, onSuccess }: CsvImportProps) {
             }
           }
 
-          if (categoryId === fallbackCategoryId) {
-            const suggestedCategory = categorizeBySuissKeywords(description, rawDescription);
-            if (suggestedCategory && categories) {
-              const matchingCategory = categories.find(c =>
-                c.name.toLowerCase().includes(suggestedCategory.toLowerCase())
-              );
-              if (matchingCategory) {
-                categoryId = matchingCategory.id;
+          if (categoryId === fallbackCategoryId && keywordRules && keywordRules.length > 0) {
+            const textToSearch = (description + ' ' + rawDescription).toLowerCase();
+
+            for (const rule of keywordRules) {
+              const pattern = rule.pattern.toLowerCase();
+              if (textToSearch.includes(pattern)) {
+                categoryId = rule.category_id;
+                break;
               }
             }
           }
@@ -350,7 +378,8 @@ export default function CsvImport({ onClose, onSuccess }: CsvImportProps) {
               account_id: selectedAccount,
               member_id: selectedMember,
               import_source: 'CSV',
-              import_line_hash: lineHash
+              import_line_hash: lineHash,
+              import_file_id: fileId
             });
 
           if (insertError) {
@@ -365,16 +394,13 @@ export default function CsvImport({ onClose, onSuccess }: CsvImportProps) {
         }
       }
 
-      await saveImportFile({
-        accountId: selectedAccount,
-        fileName: file.name,
-        fileSize: file.size,
-        fileHash,
-        rowsTotal: parsed.rows.length,
-        rowsImported: imported,
-        rowsSkipped: skipped,
-        presetUsed: detectedPreset?.name
-      });
+      await supabase
+        .from('import_files')
+        .update({
+          rows_imported: imported,
+          rows_skipped: skipped
+        })
+        .eq('id', fileId);
 
       setImportResult({
         total: parsed.rows.length,
@@ -383,7 +409,7 @@ export default function CsvImport({ onClose, onSuccess }: CsvImportProps) {
         errors
       });
 
-      setStep('result');
+      setStep('categorize');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Import failed');
     } finally {
@@ -477,8 +503,25 @@ export default function CsvImport({ onClose, onSuccess }: CsvImportProps) {
           {step === 'result' && importResult && (
             <ResultStep result={importResult} onFinish={handleFinish} />
           )}
+
+          {step === 'categorize' && (
+            <div className="text-center text-white">
+              <p>Import complete! Loading categorization...</p>
+            </div>
+          )}
         </div>
       </div>
+
+      {step === 'categorize' && importFileId && (
+        <QuickCategorization
+          importFileId={importFileId}
+          onClose={() => setStep('result')}
+          onComplete={() => {
+            onSuccess?.();
+            setStep('result');
+          }}
+        />
+      )}
     </div>
   );
 }

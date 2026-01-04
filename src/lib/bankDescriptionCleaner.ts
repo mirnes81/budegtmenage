@@ -34,7 +34,7 @@ export function cleanBankDescription(text: string): string {
 
   cleaned = cleaned
     .replace(/\s+/g, ' ')
-    .replace(/[;\-]+$/, '')
+    .replace(/[;-]+$/, '')
     .trim();
 
   return cleaned;
@@ -48,8 +48,8 @@ export function normalizeMerchant(description: string): string {
   normalized = normalized.replace(/\b\d{4}\b/g, '');
 
   const cityPatterns = [
-    /\b\d{4}\s+[A-Z\-]+$/,
-    /\b[A-Z\-]+\s+\d{4}$/,
+    /\b\d{4}\s+[A-Z-]+$/,
+    /\b[A-Z-]+\s+\d{4}$/,
     /\sCH$/,
     /\sIT\s/,
     /\sDE\s/,
@@ -64,7 +64,7 @@ export function normalizeMerchant(description: string): string {
 
   normalized = normalized
     .replace(/\s+/g, ' ')
-    .replace(/[,;.\-]+$/, '')
+    .replace(/[,;.-]+$/, '')
     .trim();
 
   const words = normalized.split(/\s+/).filter(w => w.length > 2);
