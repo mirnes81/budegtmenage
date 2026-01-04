@@ -24,6 +24,12 @@ import {
   checkDuplicateFile,
   saveImportFile
 } from '../lib/importDeduplication';
+import {
+  cleanBankDescription,
+  normalizeMerchant,
+  categorizeBySuissKeywords,
+  extractMerchantFromUBS
+} from '../lib/bankDescriptionCleaner';
 
 type Step = 'upload' | 'detect' | 'mapping' | 'result';
 
@@ -276,11 +282,17 @@ export default function CsvImport({ onClose, onSuccess }: CsvImportProps) {
             row[descIndex] || '',
             desc2Index >= 0 ? row[desc2Index] || '' : '',
             desc3Index >= 0 ? row[desc3Index] || '' : ''
-          ].filter(part => part.trim()).map(part => part.trim());
+          ];
 
-          const description = normalizeDescription(
-            descParts.length > 0 ? descParts.join(' ') : 'Unknown'
+          const rawDescription = descParts.filter(part => part.trim()).join(' ');
+
+          const cleanedDescription = extractMerchantFromUBS(
+            descParts[0] || '',
+            descParts[1] || '',
+            descParts[2] || ''
           );
+
+          const description = cleanedDescription || 'Unknown';
 
           const lineHash = await generateLineHash({
             accountId: selectedAccount,
@@ -303,7 +315,7 @@ export default function CsvImport({ onClose, onSuccess }: CsvImportProps) {
           let categoryId = fallbackCategoryId;
 
           if (applyMerchantRules) {
-            const merchantKey = description.toLowerCase().trim();
+            const merchantKey = normalizeMerchant(description);
             const { data: rule } = await supabase
               .from('merchant_rules')
               .select('default_category_id')
@@ -312,6 +324,18 @@ export default function CsvImport({ onClose, onSuccess }: CsvImportProps) {
 
             if (rule?.default_category_id) {
               categoryId = rule.default_category_id;
+            }
+          }
+
+          if (categoryId === fallbackCategoryId) {
+            const suggestedCategory = categorizeBySuissKeywords(description, rawDescription);
+            if (suggestedCategory && categories) {
+              const matchingCategory = categories.find(c =>
+                c.name.toLowerCase().includes(suggestedCategory.toLowerCase())
+              );
+              if (matchingCategory) {
+                categoryId = matchingCategory.id;
+              }
             }
           }
 
