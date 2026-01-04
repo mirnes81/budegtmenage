@@ -212,6 +212,27 @@ export default function CsvImport({ onClose, onSuccess }: CsvImportProps) {
       const debitIndex = mapping.debit ? csvData.headers.indexOf(mapping.debit) : -1;
       const creditIndex = mapping.credit ? csvData.headers.indexOf(mapping.credit) : -1;
 
+      let fallbackCategoryId: string | null = null;
+      const { data: categories } = await supabase
+        .from('categories')
+        .select('id, name')
+        .order('name');
+
+      if (categories && categories.length > 0) {
+        const diversCategory = categories.find(c =>
+          c.name.toLowerCase() === 'divers' ||
+          c.name.toLowerCase() === 'autres' ||
+          c.name.toLowerCase() === 'other'
+        );
+        fallbackCategoryId = diversCategory?.id || categories[0].id;
+      }
+
+      if (!fallbackCategoryId) {
+        setError('No categories found. Please create at least one category first.');
+        setLoading(false);
+        return;
+      }
+
       let imported = 0;
       let skipped = 0;
       const errors: string[] = [];
@@ -279,6 +300,21 @@ export default function CsvImport({ onClose, onSuccess }: CsvImportProps) {
             continue;
           }
 
+          let categoryId = fallbackCategoryId;
+
+          if (applyMerchantRules) {
+            const merchantKey = description.toLowerCase().trim();
+            const { data: rule } = await supabase
+              .from('merchant_rules')
+              .select('default_category_id')
+              .ilike('merchant_key', `%${merchantKey.slice(0, 30)}%`)
+              .maybeSingle();
+
+            if (rule?.default_category_id) {
+              categoryId = rule.default_category_id;
+            }
+          }
+
           const { error: insertError } = await supabase
             .from('transactions')
             .insert({
@@ -286,6 +322,7 @@ export default function CsvImport({ onClose, onSuccess }: CsvImportProps) {
               amount,
               type: amount >= 0 ? 'income' : 'expense',
               description,
+              category_id: categoryId,
               account_id: selectedAccount,
               member_id: selectedMember,
               import_source: 'CSV',
@@ -463,7 +500,7 @@ function UploadStep({
           <select
             value={selectedAccount}
             onChange={(e) => onAccountChange(e.target.value)}
-            className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-400"
           >
             <option value="">Choisir un compte...</option>
             {accounts.map(account => (
@@ -657,7 +694,7 @@ function MappingStep({
                 onChange={(e) =>
                   onMappingChange({ ...mapping, [field]: e.target.value || null })
                 }
-                className="flex-1 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="flex-1 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-400"
               >
                 <option value="">Not mapped</option>
                 {headers.map(header => (
@@ -686,7 +723,7 @@ function MappingStep({
           <select
             value={selectedMember}
             onChange={(e) => onMemberChange(e.target.value)}
-            className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-400"
           >
             {members.map(member => (
               <option key={member.id} value={member.id}>
