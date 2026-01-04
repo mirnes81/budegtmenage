@@ -98,6 +98,8 @@ export interface Database {
           is_active: boolean
           order_index: number
           created_at: string
+          group_name: string | null
+          is_hidden: boolean
         }
         Insert: {
           id?: string
@@ -109,6 +111,8 @@ export interface Database {
           is_active?: boolean
           order_index?: number
           created_at?: string
+          group_name?: string | null
+          is_hidden?: boolean
         }
         Update: {
           id?: string
@@ -120,6 +124,8 @@ export interface Database {
           is_active?: boolean
           order_index?: number
           created_at?: string
+          group_name?: string | null
+          is_hidden?: boolean
         }
       }
       transactions: {

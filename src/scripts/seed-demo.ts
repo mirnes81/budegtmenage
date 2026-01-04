@@ -47,7 +47,7 @@ async function seedDemo() {
 
   const coursesId = dbCategories.find(c => c.name === 'Courses')?.id;
   const restaurantsId = dbCategories.find(c => c.name === 'Restaurants')?.id;
-  const essenceId = dbCategories.find(c => c.name === 'Essence')?.id;
+  const essenceId = dbCategories.find(c => c.name === 'Essence/Recharge' || c.name === 'Essence')?.id;
   const loisirsId = dbCategories.find(c => c.name === 'Loisirs')?.id;
   const salaireId = dbCategories.find(c => c.name === 'Salaire')?.id;
   const electriciteId = dbCategories.find(c => c.name === 'Électricité')?.id;

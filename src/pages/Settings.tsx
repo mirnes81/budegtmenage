@@ -1,9 +1,12 @@
-import { useState } from 'react';
-import { Moon, Sun, Key, Database, Download, Upload } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Moon, Sun, Key, Database, Download, Upload, Eye, EyeOff, ChevronDown, ChevronRight } from 'lucide-react';
 import { useAppStore } from '../store/appStore';
 import { useAuthStore } from '../store/authStore';
 import { changePassword } from '../lib/auth';
 import { supabase } from '../lib/supabase';
+import { Database as DatabaseTypes } from '../lib/database.types';
+
+type Category = DatabaseTypes['public']['Tables']['categories']['Row'];
 
 export function Settings() {
   const { darkMode, toggleDarkMode } = useAppStore();
@@ -13,6 +16,68 @@ export function Settings() {
   const [passwordData, setPasswordData] = useState({ current: '', new: '', confirm: '' });
   const [passwordError, setPasswordError] = useState('');
   const [passwordSuccess, setPasswordSuccess] = useState(false);
+
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({});
+  const [loadingCategories, setLoadingCategories] = useState(false);
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  const fetchCategories = async () => {
+    setLoadingCategories(true);
+    try {
+      const { data, error } = await supabase
+        .from('categories')
+        .select('*')
+        .order('group_name')
+        .order('order_index');
+
+      if (error) throw error;
+      setCategories(data || []);
+
+      const groups: Record<string, boolean> = {};
+      data?.forEach((cat) => {
+        const groupName = cat.group_name || 'Autres';
+        if (!(groupName in groups)) {
+          groups[groupName] = true;
+        }
+      });
+      setExpandedGroups(groups);
+    } catch (error) {
+      console.error('Erreur chargement catégories:', error);
+    } finally {
+      setLoadingCategories(false);
+    }
+  };
+
+  const toggleCategoryVisibility = async (categoryId: string, currentHidden: boolean) => {
+    try {
+      const { error } = await supabase
+        .from('categories')
+        .update({ is_hidden: !currentHidden })
+        .eq('id', categoryId);
+
+      if (error) throw error;
+
+      setCategories((prev) =>
+        prev.map((cat) =>
+          cat.id === categoryId ? { ...cat, is_hidden: !currentHidden } : cat
+        )
+      );
+    } catch (error) {
+      console.error('Erreur mise à jour visibilité:', error);
+      alert('Erreur lors de la mise à jour');
+    }
+  };
+
+  const toggleGroup = (groupName: string) => {
+    setExpandedGroups((prev) => ({
+      ...prev,
+      [groupName]: !prev[groupName],
+    }));
+  };
 
   const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -200,6 +265,91 @@ export function Settings() {
               <span className="font-medium">Europe/Zurich</span>
             </div>
           </div>
+        </div>
+
+        <div className="bg-slate-800 rounded-xl p-6 border border-slate-700">
+          <h2 className="text-xl font-bold mb-4">Catégories</h2>
+          <p className="text-sm text-slate-400 mb-4">
+            Gérer la visibilité des catégories. Les catégories masquées n'apparaissent plus dans les listes mais l'historique est préservé.
+          </p>
+
+          {loadingCategories ? (
+            <div className="text-center py-8 text-slate-400">Chargement...</div>
+          ) : (
+            <div className="space-y-3">
+              {Object.entries(
+                categories.reduce((acc, cat) => {
+                  const groupName = cat.group_name || 'Autres';
+                  if (!acc[groupName]) acc[groupName] = [];
+                  acc[groupName].push(cat);
+                  return acc;
+                }, {} as Record<string, Category[]>)
+              ).map(([groupName, groupCategories]) => (
+                <div key={groupName} className="bg-slate-700/50 rounded-lg overflow-hidden">
+                  <button
+                    onClick={() => toggleGroup(groupName)}
+                    className="w-full flex items-center justify-between p-4 hover:bg-slate-700 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      {expandedGroups[groupName] ? (
+                        <ChevronDown size={20} className="text-slate-400" />
+                      ) : (
+                        <ChevronRight size={20} className="text-slate-400" />
+                      )}
+                      <span className="font-semibold text-white">{groupName}</span>
+                      <span className="text-sm text-slate-400">
+                        ({groupCategories.length})
+                      </span>
+                    </div>
+                  </button>
+
+                  {expandedGroups[groupName] && (
+                    <div className="px-4 pb-3 space-y-2">
+                      {groupCategories.map((category) => (
+                        <div
+                          key={category.id}
+                          className={`flex items-center justify-between p-3 rounded-lg ${
+                            category.is_hidden ? 'bg-slate-800/50' : 'bg-slate-700'
+                          }`}
+                        >
+                          <div className="flex items-center gap-3">
+                            <div
+                              className="w-8 h-8 rounded-lg flex items-center justify-center text-sm"
+                              style={{ backgroundColor: category.color }}
+                            >
+                              {category.icon}
+                            </div>
+                            <div>
+                              <p className={`font-medium ${category.is_hidden ? 'text-slate-500' : 'text-white'}`}>
+                                {category.name}
+                              </p>
+                              <p className="text-xs text-slate-400">
+                                {category.type === 'expense' ? 'Dépense' : 'Revenu'}
+                                {category.is_hidden && ' • Masquée'}
+                              </p>
+                            </div>
+                          </div>
+                          <button
+                            onClick={() =>
+                              toggleCategoryVisibility(category.id, category.is_hidden)
+                            }
+                            className={`p-2 rounded-lg transition-colors ${
+                              category.is_hidden
+                                ? 'bg-green-600/20 hover:bg-green-600/30 text-green-400'
+                                : 'bg-slate-600 hover:bg-slate-500 text-slate-300'
+                            }`}
+                            title={category.is_hidden ? 'Afficher' : 'Masquer'}
+                          >
+                            {category.is_hidden ? <Eye size={18} /> : <EyeOff size={18} />}
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="bg-slate-800 rounded-xl p-6 border border-slate-700">

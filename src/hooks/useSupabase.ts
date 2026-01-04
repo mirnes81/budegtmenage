@@ -80,6 +80,7 @@ export function useCategories() {
         .from('categories')
         .select('*')
         .eq('is_active', true)
+        .eq('is_hidden', false)
         .order('order_index');
 
       if (error) throw error;

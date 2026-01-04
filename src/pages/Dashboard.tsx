@@ -3,6 +3,8 @@ import { TrendingUp, TrendingDown, Wallet, PiggyBank } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { formatCHF } from '../lib/utils';
 import { format, startOfMonth, endOfMonth } from 'date-fns';
+import { FAB } from '../components/ui/FAB';
+import { QuickAddTransaction } from '../components/QuickAddTransaction';
 
 interface Stats {
   income: number;
@@ -15,6 +17,7 @@ export function Dashboard() {
   const [stats, setStats] = useState<Stats>({ income: 0, expenses: 0, balance: 0, accountsTotal: 0 });
   const [loading, setLoading] = useState(true);
   const [recentTransactions, setRecentTransactions] = useState<any[]>([]);
+  const [showQuickAdd, setShowQuickAdd] = useState(false);
 
   useEffect(() => {
     fetchDashboardData();
@@ -164,6 +167,13 @@ export function Dashboard() {
           )}
         </div>
       </div>
+
+      <FAB onClick={() => setShowQuickAdd(true)} />
+      <QuickAddTransaction
+        open={showQuickAdd}
+        onClose={() => setShowQuickAdd(false)}
+        onSuccess={fetchDashboardData}
+      />
     </div>
   );
 }
