@@ -25,17 +25,6 @@ interface QuickAddTransactionProps {
     description: string;
     notes: string | null;
   } | null;
-  duplicatingTransaction?: {
-    id?: string;
-    date?: string;
-    amount: number;
-    type: 'expense' | 'income';
-    category_id: string;
-    account_id: string;
-    member_id: string;
-    description: string;
-    notes: string | null;
-  } | null;
 }
 
 export function QuickAddTransaction({
@@ -43,7 +32,6 @@ export function QuickAddTransaction({
   onClose,
   onSuccess,
   editingTransaction,
-  duplicatingTransaction,
 }: QuickAddTransactionProps) {
   const { members } = useMembers();
   const { accounts } = useAccounts();
@@ -75,20 +63,11 @@ export function QuickAddTransaction({
         setCategoryId(editingTransaction.category_id);
         setAccountId(editingTransaction.account_id);
         setMemberId(editingTransaction.member_id);
-      } else if (duplicatingTransaction) {
-        setAmount(Math.abs(duplicatingTransaction.amount).toString());
-        setType(duplicatingTransaction.type);
-        setDescription(duplicatingTransaction.description);
-        setNotes(duplicatingTransaction.notes || '');
-        setDate(format(new Date(), 'yyyy-MM-dd'));
-        setCategoryId(duplicatingTransaction.category_id);
-        setAccountId(duplicatingTransaction.account_id);
-        setMemberId(duplicatingTransaction.member_id);
       } else {
         resetToDefaults();
       }
     }
-  }, [open, editingTransaction, duplicatingTransaction]);
+  }, [open, editingTransaction]);
 
   const resetToDefaults = () => {
     const defaults = getTransactionDefaults();
@@ -184,13 +163,7 @@ export function QuickAddTransaction({
       <Sheet
         open={open}
         onClose={onClose}
-        title={
-          editingTransaction
-            ? 'Modifier transaction'
-            : duplicatingTransaction
-            ? 'Dupliquer transaction'
-            : 'Nouvelle transaction'
-        }
+        title={editingTransaction ? 'Modifier transaction' : 'Nouvelle transaction'}
       >
         <form onSubmit={(e) => { e.preventDefault(); handleSave(); }} className="space-y-6">
           <div>

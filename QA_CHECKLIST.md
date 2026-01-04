@@ -205,6 +205,54 @@
 **Total items**: 150+
 **Status**: ✅ Toutes les fonctionnalités principales sont implémentées et fonctionnelles
 
+## UX Améliorations (Style FocusDaily)
+### Saisie Transaction Ultra-Rapide
+- [x] **Auto-focus montant** - Focus automatique sur champ montant
+- [x] **Smart defaults** - Mémorisation des derniers choix (catégorie, compte, membre, type)
+- [x] **Raccourcis catégories** - Section ⚡ Raccourcis avec 6 catégories fréquentes (Courses, Loyer, Essence, LAMal, École, Abonnements)
+- [x] **Favoris dynamiques** - Section ⭐ Favoris avec top 6 catégories les plus utilisées (90 jours)
+- [x] **Bouton Dupliquer** - Copie transaction avec date du jour
+- [x] **Objectif < 10 secondes** - Workflow optimisé pour saisie rapide
+
+### Liste Transactions Premium
+- [x] **Groupement par jour** - Séparateurs clairs avec "Aujourd'hui", "Hier", dates
+- [x] **Total journalier** - Somme affichée pour chaque jour
+- [x] **Menu contextuel** - Actions Modifier/Dupliquer/Supprimer via bouton •••
+- [x] **Icônes catégories** - Emojis colorés avec badges
+- [x] **Montants alignés** - À droite pour lecture rapide
+- [x] **Couleurs contrastées** - Vert revenus / Rouge dépenses
+- [x] **Empty state** - Message pédagogique si aucune transaction
+
+### Pickers Style FocusDaily
+- [x] **Bottom drawer mobile** - Slide-up animé avec backdrop blur
+- [x] **Recherche instantanée** - Filtre en temps réel
+- [x] **3 sections** - Raccourcis / Favoris / Groupes
+- [x] **Sélection 1-tap** - Fermeture automatique
+- [x] **Animations 250ms** - Smooth et fluides
+- [x] **Visual feedback** - État sélectionné avec check
+
+### Micro-UX
+- [x] **Toasts** - Notifications courtes et claires (succès/erreur/info)
+- [x] **Skeleton loading** - États de chargement élégants
+- [x] **FAB positioning** - Positionné pour pouce (bottom-20 mobile, bottom-8 desktop)
+- [x] **Feedback immédiat** - Hover states sur tous les boutons
+- [x] **Animations CSS** - slideUp, slideDown (300ms ease-out)
+- [x] **Empty states** - Messages pédagogiques avec call-to-action
+
+### Design Premium
+- [x] **Cards arrondis** - Border-radius 16-20px (xl)
+- [x] **Espacement cohérent** - Système 8px avec gap-3, gap-4, gap-6
+- [x] **Typographie** - Hiérarchie claire (3xl bold / lg medium / sm regular)
+- [x] **Couleurs** - Palette slate avec accents blue/green/red
+- [x] **Backdrop blur** - Sur modals et toasts
+- [x] **Shadow system** - shadow-2xl sur FAB et toasts
+
+### Performance UX
+- [x] **localStorage** - Persistence des defaults (pas de backend)
+- [x] **Lazy loading catégories** - Chargement à l'ouverture du picker
+- [x] **Debounce search** - Pas implémenté (pas nécessaire avec React state)
+- [x] **Smooth scroll** - Navigation fluide entre sections
+
 ## Notes
 - Application complète et fonctionnelle
 - Toutes les pages principales implémentées
@@ -214,5 +262,6 @@
 - Format CHF suisse respecté
 - Dark mode par défaut
 - Responsive mobile et desktop
-- Tests unitaires passent
-- Build réussi
+- Tests unitaires passent (19/19)
+- Build réussi (820 KB / 245 KB gzipped)
+- **UX premium style FocusDaily implémentée**

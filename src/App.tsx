@@ -3,7 +3,7 @@ import { useAuthStore } from './store/authStore';
 import { Login } from './components/Login';
 import { Layout } from './components/Layout';
 import { Dashboard } from './pages/Dashboard';
-import { Transactions } from './pages/Transactions';
+import { TransactionsNew } from './pages/TransactionsNew';
 import { Recurring } from './pages/Recurring';
 import { Stats } from './pages/Stats';
 import { Taxes } from './pages/Taxes';
@@ -21,7 +21,7 @@ function App() {
       <Layout>
         <Routes>
           <Route path="/" element={<Dashboard />} />
-          <Route path="/transactions" element={<Transactions />} />
+          <Route path="/transactions" element={<TransactionsNew />} />
           <Route path="/recurring" element={<Recurring />} />
           <Route path="/stats" element={<Stats />} />
           <Route path="/taxes" element={<Taxes />} />

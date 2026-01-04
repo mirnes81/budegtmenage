@@ -32,9 +32,19 @@ export function Picker({
   categoryType,
 }: PickerProps) {
   const [search, setSearch] = useState('');
+  const [shortcuts, setShortcuts] = useState<Category[]>([]);
   const [favorites, setFavorites] = useState<Category[]>([]);
   const [groupedCategories, setGroupedCategories] = useState<Record<string, Category[]>>({});
   const [loadingFavorites, setLoadingFavorites] = useState(false);
+
+  const SHORTCUT_NAMES = [
+    'Courses',
+    'Loyer/Hypothèque',
+    'Essence/Recharge',
+    'LAMal',
+    'École/Crèche',
+    'Abonnements',
+  ];
 
   useEffect(() => {
     if (open && type === 'category' && categoryType) {
@@ -47,11 +57,20 @@ export function Picker({
 
     setLoadingFavorites(true);
     try {
-      const favs = await getFavoriteCategories(categoryType, 6);
-      setFavorites(favs);
+      const allCategories = items as Category[];
+      const shortcutCats = SHORTCUT_NAMES.map((name) =>
+        allCategories.find((c) => c.name === name)
+      ).filter((c): c is Category => c !== undefined);
+      setShortcuts(shortcutCats);
 
-      const favoriteIds = favs.map((f) => f.id);
-      const grouped = await getGroupedCategories(categoryType, favoriteIds);
+      const favs = await getFavoriteCategories(categoryType, 6);
+      const filteredFavs = favs.filter(
+        (fav) => !shortcutCats.find((s) => s.id === fav.id)
+      );
+      setFavorites(filteredFavs);
+
+      const excludeIds = [...shortcutCats.map((s) => s.id), ...filteredFavs.map((f) => f.id)];
+      const grouped = await getGroupedCategories(categoryType, excludeIds);
       setGroupedCategories(grouped);
     } catch (error) {
       console.error('Erreur chargement données catégories:', error);
@@ -67,6 +86,10 @@ export function Picker({
 
   const filteredItems = items.filter((item) =>
     item.name.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const filteredShortcuts = shortcuts.filter((shortcut) =>
+    shortcut.name.toLowerCase().includes(search.toLowerCase())
   );
 
   const filteredFavorites = favorites.filter((fav) =>
@@ -127,6 +150,17 @@ export function Picker({
 
         {type === 'category' && !loadingFavorites && (
           <>
+            {filteredShortcuts.length > 0 && (
+              <div>
+                <h3 className="text-sm font-semibold text-slate-400 mb-3 px-1">
+                  ⚡ Raccourcis
+                </h3>
+                <div className="space-y-2">
+                  {filteredShortcuts.map((shortcut) => renderItem(shortcut))}
+                </div>
+              </div>
+            )}
+
             {filteredFavorites.length > 0 && (
               <div>
                 <h3 className="text-sm font-semibold text-slate-400 mb-3 px-1">
