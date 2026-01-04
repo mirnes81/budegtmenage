@@ -1,11 +1,11 @@
-import { Home, Receipt, RepeatIcon, BarChart3, Settings } from 'lucide-react';
+import { Home, Receipt, RepeatIcon, BarChart3, Settings, Wallet } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 
 const navItems = [
-  { path: '/', icon: Home, label: 'Tableau de bord' },
+  { path: '/', icon: Home, label: 'Accueil' },
   { path: '/transactions', icon: Receipt, label: 'Transactions' },
-  { path: '/recurring', icon: RepeatIcon, label: 'Charges fixes' },
-  { path: '/stats', icon: BarChart3, label: 'Statistiques' },
+  { path: '/accounts', icon: Wallet, label: 'Comptes' },
+  { path: '/stats', icon: BarChart3, label: 'Stats' },
   { path: '/settings', icon: Settings, label: 'Paramètres' },
 ];
 
