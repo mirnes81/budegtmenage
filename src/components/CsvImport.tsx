@@ -578,53 +578,53 @@ function DetectStep({
 }) {
   return (
     <div className="space-y-6">
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <h3 className="font-medium text-blue-900 mb-2">Detection Results</h3>
+      <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+        <h3 className="font-medium text-blue-900 dark:text-blue-100 mb-2">Detection Results</h3>
         <div className="space-y-2 text-sm">
           <div className="flex justify-between">
-            <span className="text-blue-700">Delimiter:</span>
-            <span className="font-mono text-blue-900">{csvData.delimiter}</span>
+            <span className="text-blue-700 dark:text-blue-300">Delimiter:</span>
+            <span className="font-mono text-blue-900 dark:text-blue-100">{csvData.delimiter}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-blue-700">Date Format:</span>
-            <span className="font-mono text-blue-900">{csvData.dateFormat || 'Unknown'}</span>
+            <span className="text-blue-700 dark:text-blue-300">Date Format:</span>
+            <span className="font-mono text-blue-900 dark:text-blue-100">{csvData.dateFormat || 'Unknown'}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-blue-700">Decimal Separator:</span>
-            <span className="font-mono text-blue-900">{csvData.decimalSeparator}</span>
+            <span className="text-blue-700 dark:text-blue-300">Decimal Separator:</span>
+            <span className="font-mono text-blue-900 dark:text-blue-100">{csvData.decimalSeparator}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-blue-700">Bank Preset:</span>
-            <span className="font-semibold text-blue-900">{preset?.name || 'Generic'}</span>
+            <span className="text-blue-700 dark:text-blue-300">Bank Preset:</span>
+            <span className="font-semibold text-blue-900 dark:text-blue-100">{preset?.name || 'Generic'}</span>
           </div>
         </div>
       </div>
 
       {duplicateWarning && (
-        <div className="flex items-start gap-2 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-          <AlertCircle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
-          <p className="text-sm text-yellow-700">{duplicateWarning}</p>
+        <div className="flex items-start gap-2 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+          <AlertCircle className="w-5 h-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5" />
+          <p className="text-sm text-yellow-700 dark:text-yellow-300">{duplicateWarning}</p>
         </div>
       )}
 
       <div>
-        <h3 className="font-medium mb-2">Preview (first 20 rows)</h3>
-        <div className="overflow-x-auto border rounded-lg">
-          <table className="min-w-full divide-y divide-gray-200 text-sm">
-            <thead className="bg-gray-50">
+        <h3 className="font-medium mb-2 dark:text-white">Preview (first 20 rows)</h3>
+        <div className="overflow-x-auto border dark:border-gray-700 rounded-lg">
+          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 text-sm">
+            <thead className="bg-gray-50 dark:bg-gray-800">
               <tr>
                 {csvData.headers.map((header, i) => (
-                  <th key={i} className="px-3 py-2 text-left font-medium text-gray-700">
+                  <th key={i} className="px-3 py-2 text-left font-medium text-gray-700 dark:text-gray-300">
                     {header}
                   </th>
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200">
+            <tbody className="divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-900">
               {csvData.rows.map((row, i) => (
-                <tr key={i} className="hover:bg-gray-50">
+                <tr key={i} className="hover:bg-gray-50 dark:hover:bg-gray-800">
                   {row.map((cell, j) => (
-                    <td key={j} className="px-3 py-2 text-gray-900">
+                    <td key={j} className="px-3 py-2 text-gray-900 dark:text-gray-100">
                       {cell}
                     </td>
                   ))}
@@ -637,7 +637,7 @@ function DetectStep({
 
       <button
         onClick={onNext}
-        className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+        className="w-full bg-blue-600 dark:bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600"
       >
         Next: Configure Mapping
       </button>
