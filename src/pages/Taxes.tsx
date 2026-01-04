@@ -212,44 +212,43 @@ export function Taxes() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-24">
       <div>
-        <h1 className="text-3xl font-bold">Estimation Impôts</h1>
-        <p className="text-slate-400 mt-1">
+        <h1 className="text-2xl md:text-3xl font-bold">Estimation Impôts</h1>
+        <p className="text-slate-400 mt-1 text-sm md:text-base">
           Estimation indicative des impôts en Suisse
         </p>
       </div>
 
       <div className="bg-amber-900/20 border border-amber-700 rounded-xl p-4 flex gap-3">
-        <AlertTriangle className="text-amber-400 flex-shrink-0" size={24} />
-        <div className="text-sm">
+        <AlertTriangle className="text-amber-400 flex-shrink-0" size={20} />
+        <div className="text-xs md:text-sm">
           <p className="text-amber-400 font-semibold mb-1">Attention: Estimation simplifiée</p>
           <p className="text-amber-200/80">
             Cette estimation est basée sur des calculs simplifiés et ne remplace pas une déclaration fiscale officielle.
-            Les barèmes varient selon le canton et la commune. Consultez un expert fiscal pour une estimation précise.
           </p>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <div className="bg-slate-800 rounded-xl p-6 border border-slate-700">
-          <div className="flex items-center justify-between mb-4">
-            <Calculator className="text-blue-400" size={24} />
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="bg-slate-800 rounded-xl p-4 md:p-6 border border-slate-700">
+          <div className="flex items-center justify-between mb-3">
+            <Calculator className="text-blue-400" size={20} />
           </div>
-          <p className="text-slate-400 text-sm mb-2">Revenu annuel estimé</p>
-          <p className="text-2xl font-bold">CHF {formatCHF(estimatedIncome)}</p>
+          <p className="text-slate-400 text-xs md:text-sm mb-2">Revenu annuel estimé</p>
+          <p className="text-xl md:text-2xl font-bold">CHF {formatCHF(estimatedIncome)}</p>
         </div>
 
-        <div className="bg-slate-800 rounded-xl p-6 border border-slate-700">
-          <p className="text-slate-400 text-sm mb-2">Estimation impôts (fourchette)</p>
-          <p className="text-2xl font-bold text-orange-400">
+        <div className="bg-slate-800 rounded-xl p-4 md:p-6 border border-slate-700">
+          <p className="text-slate-400 text-xs md:text-sm mb-2">Estimation impôts</p>
+          <p className="text-xl md:text-2xl font-bold text-orange-400 truncate">
             CHF {formatCHF(taxEstimate.low)} - {formatCHF(taxEstimate.high)}
           </p>
         </div>
 
-        <div className="bg-slate-800 rounded-xl p-6 border border-slate-700">
-          <p className="text-slate-400 text-sm mb-2">Taux marginal estimé</p>
-          <p className={`text-2xl font-bold ${taxEstimate.marginalRate > 30 ? 'text-red-400' : 'text-green-400'}`}>
+        <div className="bg-slate-800 rounded-xl p-4 md:p-6 border border-slate-700">
+          <p className="text-slate-400 text-xs md:text-sm mb-2">Taux marginal estimé</p>
+          <p className={`text-xl md:text-2xl font-bold ${taxEstimate.marginalRate > 30 ? 'text-red-400' : 'text-green-400'}`}>
             {taxEstimate.marginalRate.toFixed(1)}%
           </p>
         </div>
@@ -257,15 +256,15 @@ export function Taxes() {
 
       {taxEstimate.marginalRate > 30 && (
         <div className="bg-red-900/20 border border-red-700 rounded-xl p-4">
-          <p className="text-red-400 font-semibold">Zone fortement taxée</p>
-          <p className="text-red-200/80 text-sm mt-1">
-            Votre taux marginal dépasse 30%. Chaque franc supplémentaire gagné est taxé à plus de 30%.
+          <p className="text-red-400 font-semibold text-sm">Zone fortement taxée</p>
+          <p className="text-red-200/80 text-xs md:text-sm mt-1">
+            Votre taux marginal dépasse 30%. Chaque franc gagné est taxé à plus de 30%.
           </p>
         </div>
       )}
 
-      <div className="bg-slate-800 rounded-xl p-6 border border-slate-700">
-        <h2 className="text-xl font-bold mb-6">Paramètres fiscaux</h2>
+      <div className="bg-slate-800 rounded-xl p-4 md:p-6 border border-slate-700">
+        <h2 className="text-lg md:text-xl font-bold mb-6">Paramètres fiscaux</h2>
 
         <div className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -384,10 +383,11 @@ export function Taxes() {
             <button
               onClick={handleSave}
               disabled={saving}
-              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-600 px-6 py-3 rounded-lg font-semibold transition-colors"
+              className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-600 px-4 md:px-6 py-3 rounded-lg font-semibold transition-colors w-full md:w-auto"
             >
-              <Save size={20} />
-              {saving ? 'Sauvegarde...' : 'Sauvegarder et recalculer'}
+              <Save size={18} />
+              <span className="hidden sm:inline">{saving ? 'Sauvegarde...' : 'Sauvegarder et recalculer'}</span>
+              <span className="sm:hidden">{saving ? 'Sauvegarde...' : 'Sauvegarder'}</span>
             </button>
           </div>
         </div>

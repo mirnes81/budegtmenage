@@ -166,47 +166,47 @@ export function Settings() {
   };
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-3xl font-bold">Paramètres</h1>
+    <div className="space-y-6 pb-24">
+      <h1 className="text-2xl md:text-3xl font-bold">Paramètres</h1>
 
       <div className="grid gap-6">
-        <div className="bg-slate-800 rounded-xl p-6 border border-slate-700">
-          <h2 className="text-xl font-bold mb-4">Apparence</h2>
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="font-medium">Mode sombre</p>
-              <p className="text-sm text-slate-400">Thème par défaut de l'application</p>
+        <div className="bg-slate-800 rounded-xl p-4 md:p-6 border border-slate-700">
+          <h2 className="text-lg md:text-xl font-bold mb-4">Apparence</h2>
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex-1 min-w-0">
+              <p className="font-medium truncate">Mode sombre</p>
+              <p className="text-xs md:text-sm text-slate-400 truncate">Thème par défaut</p>
             </div>
             <button
               onClick={toggleDarkMode}
-              className="flex items-center gap-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors"
+              className="flex items-center gap-2 px-3 md:px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors whitespace-nowrap flex-shrink-0"
             >
-              {darkMode ? <Moon size={20} /> : <Sun size={20} />}
+              {darkMode ? <Moon size={18} /> : <Sun size={18} />}
               {darkMode ? 'Sombre' : 'Clair'}
             </button>
           </div>
         </div>
 
-        <div className="bg-slate-800 rounded-xl p-6 border border-slate-700">
-          <h2 className="text-xl font-bold mb-4">Sécurité</h2>
+        <div className="bg-slate-800 rounded-xl p-4 md:p-6 border border-slate-700">
+          <h2 className="text-lg md:text-xl font-bold mb-4">Sécurité</h2>
           <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="font-medium">Mot de passe</p>
-                <p className="text-sm text-slate-400">Modifier votre mot de passe d'accès</p>
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex-1 min-w-0">
+                <p className="font-medium truncate">Mot de passe</p>
+                <p className="text-xs md:text-sm text-slate-400 truncate">Modifier votre accès</p>
               </div>
               <button
                 onClick={() => setShowPasswordModal(true)}
-                className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors"
+                className="flex items-center gap-2 px-3 md:px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors whitespace-nowrap flex-shrink-0"
               >
-                <Key size={20} />
-                Changer
+                <Key size={18} />
+                <span className="hidden sm:inline">Changer</span>
               </button>
             </div>
             <div className="pt-4 border-t border-slate-700">
               <button
                 onClick={logout}
-                className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg transition-colors"
+                className="flex items-center gap-2 px-3 md:px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg transition-colors whitespace-nowrap"
               >
                 Se déconnecter
               </button>
@@ -214,30 +214,30 @@ export function Settings() {
           </div>
         </div>
 
-        <div className="bg-slate-800 rounded-xl p-6 border border-slate-700">
-          <h2 className="text-xl font-bold mb-4">Données</h2>
+        <div className="bg-slate-800 rounded-xl p-4 md:p-6 border border-slate-700">
+          <h2 className="text-lg md:text-xl font-bold mb-4">Données</h2>
           <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="font-medium">Exporter les données</p>
-                <p className="text-sm text-slate-400">Télécharger une sauvegarde JSON complète</p>
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex-1 min-w-0">
+                <p className="font-medium truncate">Exporter les données</p>
+                <p className="text-xs md:text-sm text-slate-400 truncate">Sauvegarde JSON</p>
               </div>
               <button
                 onClick={exportData}
-                className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg transition-colors"
+                className="flex items-center gap-2 px-3 md:px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg transition-colors whitespace-nowrap flex-shrink-0"
               >
-                <Download size={20} />
-                Exporter
+                <Download size={18} />
+                <span className="hidden sm:inline">Exporter</span>
               </button>
             </div>
-            <div className="pt-4 border-t border-slate-700 flex items-center justify-between">
-              <div>
-                <p className="font-medium">Importer les données</p>
-                <p className="text-sm text-slate-400">Restaurer depuis une sauvegarde</p>
+            <div className="pt-4 border-t border-slate-700 flex items-center justify-between gap-4">
+              <div className="flex-1 min-w-0">
+                <p className="font-medium truncate">Importer les données</p>
+                <p className="text-xs md:text-sm text-slate-400 truncate">Restaurer sauvegarde</p>
               </div>
-              <label className="flex items-center gap-2 px-4 py-2 bg-orange-600 hover:bg-orange-700 rounded-lg transition-colors cursor-pointer">
-                <Upload size={20} />
-                Importer
+              <label className="flex items-center gap-2 px-3 md:px-4 py-2 bg-orange-600 hover:bg-orange-700 rounded-lg transition-colors cursor-pointer whitespace-nowrap flex-shrink-0">
+                <Upload size={18} />
+                <span className="hidden sm:inline">Importer</span>
                 <input
                   type="file"
                   accept=".json"
@@ -249,28 +249,28 @@ export function Settings() {
           </div>
         </div>
 
-        <div className="bg-slate-800 rounded-xl p-6 border border-slate-700">
-          <h2 className="text-xl font-bold mb-4">Format</h2>
+        <div className="bg-slate-800 rounded-xl p-4 md:p-6 border border-slate-700">
+          <h2 className="text-lg md:text-xl font-bold mb-4">Format</h2>
           <div className="space-y-3">
-            <div className="flex justify-between items-center p-3 bg-slate-700/50 rounded-lg">
-              <span className="text-slate-400">Devise</span>
-              <span className="font-medium">CHF (Franc suisse)</span>
+            <div className="flex justify-between items-center gap-4 p-3 bg-slate-700/50 rounded-lg">
+              <span className="text-xs md:text-sm text-slate-400 truncate">Devise</span>
+              <span className="font-medium text-sm whitespace-nowrap flex-shrink-0">CHF</span>
             </div>
-            <div className="flex justify-between items-center p-3 bg-slate-700/50 rounded-lg">
-              <span className="text-slate-400">Format nombres</span>
-              <span className="font-medium">3'420.50 (apostrophe milliers)</span>
+            <div className="flex justify-between items-center gap-4 p-3 bg-slate-700/50 rounded-lg">
+              <span className="text-xs md:text-sm text-slate-400 truncate">Format nombres</span>
+              <span className="font-medium text-sm whitespace-nowrap flex-shrink-0">3'420.50</span>
             </div>
-            <div className="flex justify-between items-center p-3 bg-slate-700/50 rounded-lg">
-              <span className="text-slate-400">Fuseau horaire</span>
-              <span className="font-medium">Europe/Zurich</span>
+            <div className="flex justify-between items-center gap-4 p-3 bg-slate-700/50 rounded-lg">
+              <span className="text-xs md:text-sm text-slate-400 truncate">Fuseau horaire</span>
+              <span className="font-medium text-sm whitespace-nowrap flex-shrink-0">Europe/Zurich</span>
             </div>
           </div>
         </div>
 
-        <div className="bg-slate-800 rounded-xl p-6 border border-slate-700">
-          <h2 className="text-xl font-bold mb-4">Catégories</h2>
-          <p className="text-sm text-slate-400 mb-4">
-            Gérer la visibilité des catégories. Les catégories masquées n'apparaissent plus dans les listes mais l'historique est préservé.
+        <div className="bg-slate-800 rounded-xl p-4 md:p-6 border border-slate-700">
+          <h2 className="text-lg md:text-xl font-bold mb-4">Catégories</h2>
+          <p className="text-xs md:text-sm text-slate-400 mb-4">
+            Gérer la visibilité des catégories. Les catégories masquées n'apparaissent plus dans les listes.
           </p>
 
           {loadingCategories ? (
@@ -308,22 +308,22 @@ export function Settings() {
                       {groupCategories.map((category) => (
                         <div
                           key={category.id}
-                          className={`flex items-center justify-between p-3 rounded-lg ${
+                          className={`flex items-center justify-between gap-3 p-3 rounded-lg ${
                             category.is_hidden ? 'bg-slate-800/50' : 'bg-slate-700'
                           }`}
                         >
-                          <div className="flex items-center gap-3">
+                          <div className="flex items-center gap-3 flex-1 min-w-0">
                             <div
-                              className="w-8 h-8 rounded-lg flex items-center justify-center text-sm"
+                              className="w-8 h-8 rounded-lg flex items-center justify-center text-sm flex-shrink-0 overflow-hidden"
                               style={{ backgroundColor: category.color }}
                             >
-                              {category.icon}
+                              <span className="text-base leading-none">{category.icon}</span>
                             </div>
-                            <div>
-                              <p className={`font-medium ${category.is_hidden ? 'text-slate-500' : 'text-white'}`}>
+                            <div className="flex-1 min-w-0">
+                              <p className={`font-medium truncate ${category.is_hidden ? 'text-slate-500' : 'text-white'}`}>
                                 {category.name}
                               </p>
-                              <p className="text-xs text-slate-400">
+                              <p className="text-xs text-slate-400 truncate">
                                 {category.type === 'expense' ? 'Dépense' : 'Revenu'}
                                 {category.is_hidden && ' • Masquée'}
                               </p>
@@ -333,7 +333,7 @@ export function Settings() {
                             onClick={() =>
                               toggleCategoryVisibility(category.id, category.is_hidden)
                             }
-                            className={`p-2 rounded-lg transition-colors ${
+                            className={`p-2 rounded-lg transition-colors flex-shrink-0 ${
                               category.is_hidden
                                 ? 'bg-green-600/20 hover:bg-green-600/30 text-green-400'
                                 : 'bg-slate-600 hover:bg-slate-500 text-slate-300'
@@ -352,16 +352,16 @@ export function Settings() {
           )}
         </div>
 
-        <div className="bg-slate-800 rounded-xl p-6 border border-slate-700">
-          <h2 className="text-xl font-bold mb-4">À propos</h2>
-          <div className="space-y-2 text-sm">
+        <div className="bg-slate-800 rounded-xl p-4 md:p-6 border border-slate-700">
+          <h2 className="text-lg md:text-xl font-bold mb-4">À propos</h2>
+          <div className="space-y-2 text-xs md:text-sm">
             <p className="text-slate-400">
               <span className="font-medium text-white">Budget Ménage Suisse</span>
               <br />
               Version 1.0.0
             </p>
             <p className="text-slate-400">
-              Application de gestion de budget familial conçue pour les ménages suisses.
+              Application de gestion de budget familial pour les ménages suisses.
             </p>
           </div>
         </div>

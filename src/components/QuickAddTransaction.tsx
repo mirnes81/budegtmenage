@@ -329,21 +329,21 @@ export function QuickAddTransaction({
               {selectedCategory ? (
                 <>
                   <div
-                    className="w-10 h-10 rounded-lg flex items-center justify-center text-xl"
+                    className="w-10 h-10 rounded-lg flex items-center justify-center text-lg flex-shrink-0 overflow-hidden"
                     style={{ backgroundColor: selectedCategory.color }}
                   >
-                    {selectedCategory.icon}
+                    <span className="leading-none">{selectedCategory.icon}</span>
                   </div>
-                  <span className="flex-1 text-left text-white">
+                  <span className="flex-1 text-left text-white truncate">
                     {selectedCategory.name}
                   </span>
                 </>
               ) : (
-                <span className="flex-1 text-left text-slate-400">
+                <span className="flex-1 text-left text-slate-400 truncate">
                   Sélectionner une catégorie
                 </span>
               )}
-              <ChevronRight size={20} className="text-slate-400" />
+              <ChevronRight size={18} className="text-slate-400 flex-shrink-0" />
             </button>
           </div>
 
@@ -437,21 +437,21 @@ export function QuickAddTransaction({
               {selectedAccount ? (
                 <>
                   <div
-                    className="w-10 h-10 rounded-lg flex items-center justify-center text-xl"
+                    className="w-10 h-10 rounded-lg flex items-center justify-center text-lg flex-shrink-0 overflow-hidden"
                     style={{ backgroundColor: selectedAccount.color }}
                   >
-                    {selectedAccount.icon}
+                    <span className="leading-none">{selectedAccount.icon}</span>
                   </div>
-                  <span className="flex-1 text-left text-white">
+                  <span className="flex-1 text-left text-white truncate">
                     {selectedAccount.name}
                   </span>
                 </>
               ) : (
-                <span className="flex-1 text-left text-slate-400">
+                <span className="flex-1 text-left text-slate-400 truncate">
                   Sélectionner un compte
                 </span>
               )}
-              <ChevronRight size={20} className="text-slate-400" />
+              <ChevronRight size={18} className="text-slate-400 flex-shrink-0" />
             </button>
           </div>
 
@@ -462,10 +462,10 @@ export function QuickAddTransaction({
               onClick={() => setShowMemberPicker(true)}
               className="w-full flex items-center gap-3 bg-slate-700 px-4 py-3 rounded-xl border border-slate-600 hover:border-slate-500 transition-colors"
             >
-              <span className="flex-1 text-left text-white">
+              <span className="flex-1 text-left text-white truncate">
                 {selectedMember ? selectedMember.name : 'Sélectionner un membre'}
               </span>
-              <ChevronRight size={20} className="text-slate-400" />
+              <ChevronRight size={18} className="text-slate-400 flex-shrink-0" />
             </button>
           </div>
 
