@@ -31,13 +31,63 @@ export function detectDelimiter(content: string): string {
 export function detectEncoding(buffer: ArrayBuffer): string {
   const bytes = new Uint8Array(buffer);
 
-  for (let i = 0; i < Math.min(bytes.length, 1000); i++) {
-    if (bytes[i] > 127) {
-      return 'ISO-8859-1';
+  if (bytes.length >= 3 && bytes[0] === 0xEF && bytes[1] === 0xBB && bytes[2] === 0xBF) {
+    return 'UTF-8';
+  }
+
+  let hasHighBytes = false;
+  let validUtf8Sequences = 0;
+  let invalidUtf8Sequences = 0;
+
+  for (let i = 0; i < Math.min(bytes.length, 4000); i++) {
+    const byte = bytes[i];
+
+    if (byte > 127) {
+      hasHighBytes = true;
+
+      if ((byte & 0xE0) === 0xC0) {
+        if (i + 1 < bytes.length && (bytes[i + 1] & 0xC0) === 0x80) {
+          validUtf8Sequences++;
+          i++;
+        } else {
+          invalidUtf8Sequences++;
+        }
+      } else if ((byte & 0xF0) === 0xE0) {
+        if (i + 2 < bytes.length &&
+            (bytes[i + 1] & 0xC0) === 0x80 &&
+            (bytes[i + 2] & 0xC0) === 0x80) {
+          validUtf8Sequences++;
+          i += 2;
+        } else {
+          invalidUtf8Sequences++;
+        }
+      } else if ((byte & 0xF8) === 0xF0) {
+        if (i + 3 < bytes.length &&
+            (bytes[i + 1] & 0xC0) === 0x80 &&
+            (bytes[i + 2] & 0xC0) === 0x80 &&
+            (bytes[i + 3] & 0xC0) === 0x80) {
+          validUtf8Sequences++;
+          i += 3;
+        } else {
+          invalidUtf8Sequences++;
+        }
+      }
     }
   }
 
-  return 'UTF-8';
+  if (!hasHighBytes) {
+    return 'UTF-8';
+  }
+
+  if (validUtf8Sequences > 0 && invalidUtf8Sequences === 0) {
+    return 'UTF-8';
+  }
+
+  if (validUtf8Sequences > invalidUtf8Sequences * 2) {
+    return 'UTF-8';
+  }
+
+  return 'windows-1252';
 }
 
 export function parseCsv(content: string, delimiter: string = ','): CsvParseResult {
