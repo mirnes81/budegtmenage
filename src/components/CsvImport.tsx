@@ -217,6 +217,8 @@ export default function CsvImport({ onClose, onSuccess }: CsvImportProps) {
       const creditIndex = mapping.credit ? csvData.headers.indexOf(mapping.credit) : -1;
 
       let fallbackCategoryId: string | null = null;
+      let revenusCategoryId: string | null = null;
+
       const { data: categories } = await supabase
         .from('categories')
         .select('id, name')
@@ -229,6 +231,13 @@ export default function CsvImport({ onClose, onSuccess }: CsvImportProps) {
           c.name.toLowerCase() === 'other'
         );
         fallbackCategoryId = diversCategory?.id || categories[0].id;
+
+        const revenusCategory = categories.find(c =>
+          c.name.toLowerCase().includes('revenu') ||
+          c.name.toLowerCase().includes('income') ||
+          c.name.toLowerCase() === 'salaire'
+        );
+        revenusCategoryId = revenusCategory?.id || null;
       }
 
       if (!fallbackCategoryId) {
@@ -365,6 +374,10 @@ export default function CsvImport({ onClose, onSuccess }: CsvImportProps) {
                 break;
               }
             }
+          }
+
+          if (amount < 0 && revenusCategoryId && categoryId === revenusCategoryId) {
+            categoryId = fallbackCategoryId;
           }
 
           const { error: insertError } = await supabase

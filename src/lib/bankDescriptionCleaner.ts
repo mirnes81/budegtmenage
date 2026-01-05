@@ -14,6 +14,19 @@ const STOP_TOKENS = [
   'Remboursement carte de debit'
 ];
 
+const REMOVE_PATTERNS = [
+  /\bCH\d{2}\s*\d{4}\s*\d{4}\s*\d{4}\s*\d{4}\s*\d/gi,
+  /\bIBAN[:\s]+[A-Z0-9\s]+/gi,
+  /\b\d{2}\.\d{2}\.\d{4}\b/g,
+  /\b\d{4}-\d{2}-\d{2}\b/g,
+  /\bReference[:\s]+[\w-]+/gi,
+  /\bNo\s+de\s+transaction[:\s]+[\w-]+/gi,
+  /\bQRR[:\s]+[\w-]+/gi,
+  /\bTel\.?\s*\d+/gi,
+  /\bwww\.\S+/gi,
+  /\bhttp\S+/gi
+];
+
 export function cleanBankDescription(text: string): string {
   if (!text) return '';
 
@@ -32,10 +45,19 @@ export function cleanBankDescription(text: string): string {
     }
   }
 
+  for (const pattern of REMOVE_PATTERNS) {
+    cleaned = cleaned.replace(pattern, '');
+  }
+
   cleaned = cleaned
     .replace(/\s+/g, ' ')
-    .replace(/[;-]+$/, '')
+    .replace(/[;,.-]+$/, '')
+    .replace(/^[;,.-]+/, '')
     .trim();
+
+  if (cleaned.length > 80) {
+    cleaned = cleaned.substring(0, 77) + '...';
+  }
 
   return cleaned;
 }
